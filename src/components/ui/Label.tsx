@@ -1,10 +1,11 @@
+
 import type { ReactNode } from "react";
 
-type LabelProps = {
+interface LabelProps {
   htmlFor: string;
   children: ReactNode;
   className?: string;
-};
+}
 
 export function Label({ htmlFor, children, className = "" }: LabelProps) {
   return (

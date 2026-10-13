@@ -4,9 +4,15 @@ import { LoginForm } from "./LoginForm";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "../../server/api/auth";
 
+interface LoginPageProps {
+  searchParams: Promise<{
+    reason?: string | string[];
+  }>;
+}
+
 export const metadata: Metadata = { title: "Entrar | Chrono" };
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ reason?: string | string[] }> }) {
+export default async function LoginPage({ searchParams }: LoginPageProps) {
   const session = await getCurrentUser();
   if (session.ok) redirect("/");
   const params = await searchParams;

@@ -6,13 +6,19 @@ import { Button } from "../../../components/ui/Button";
 import { Label } from "../../../components/ui/Label";
 import { FieldError } from "../../../components/ui/FieldError";
 import { dayHref } from "../../../lib/calendar-date";
-import { validateEvent, type EventDraft, type EventFormState } from "../../../lib/event-input";
+import { validateEvent } from "../../../lib/event-input";
 import { createEventAction } from "./actions";
+import type { EventDraft, EventFormState } from "./state";
+
+interface EventFormProps {
+  date: string;
+  time: string;
+}
 
 const control = "min-h-11 w-full min-w-0 rounded-control border border-text-secondary bg-surface px-3 py-2 text-base aria-invalid:border-error";
 const labels: Record<keyof EventDraft, string> = { title: "Título", type: "Categoria", date: "Data", startTime: "Início (opcional)", endTime: "Fim (opcional)", description: "Descrição (opcional)", status: "Status" };
 
-export function EventForm({ date, time }: { date: string; time: string }) {
+export function EventForm({ date, time }: EventFormProps) {
   const [draft, setDraft] = useState<EventDraft>({ title: "", type: "TASK", date, startTime: time, endTime: "", description: "", status: "PENDING" });
   const [state, action, pending] = useActionState(createEventAction, {} as EventFormState);
   const [localErrors, setLocalErrors] = useState<EventFormState["errors"]>();

@@ -30,6 +30,10 @@ Copie `.env.example` para `.env.local` e configure `API_BASE_URL` (padrão local
 
 ## Organização e continuidade
 
+Os tipos seguem uma organização híbrida. `src/models/{calendar,event,auth}.ts` contém domínio e contratos da API. Tipos de transporte (`ApiResult`, `ApiFailure`, `ApiRequest`) ficam em `src/server/api/types.ts`. Props são declaradas no próprio componente ou página; estados compartilhados de formulário ficam em `src/app/login/state.ts` e `src/app/atividades/nova/state.ts`. Tipos do cálculo visual, como `PositionedActivity` e `MonthGrid`, ficam junto dos helpers que os produzem. Use `interface` para objetos, `type` para aliases, uniões e tipos derivados, propriedades em linhas separadas e `import type` nos consumidores. Models não contêm lógica; validação e acesso à API permanecem em `lib` e `server`.
+
+`EventDraft` representa campos ainda não validados, por isso mantém strings livres. `CreateEventInput` representa o payload validado e restringe categoria/status às uniões do contrato.
+
 `src/app/login` contém a tela, o formulário e a Server Action de login. `src/server` contém configuração privada, transporte e sessão, protegidos por `server-only`. `src/components/ui` contém `Button`, `Input`, `Label` e `FieldError`. Os componentes usam Tailwind; `globals.css` fica restrito aos tokens e à base. Os controles temporários de simulação foram removidos.
 
 O formulário envia somente a senha para a Server Action, que chama `POST /auth/login`. A resposta é validada antes de salvar o JWT no cookie `chrono_session`: HttpOnly, SameSite=Lax, Path=/, Secure em produção e validade baseada em `expiresIn`. Use HTTPS em produção. Token e resposta bruta de login não são retornados ao JavaScript do navegador.

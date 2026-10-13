@@ -4,9 +4,15 @@ import { adjacentDate, adjacentMonth, adjacentWeek, dayHref, formatCalendarDate,
 import { Button } from "../ui/Button";
 import { Label } from "../ui/Label";
 
+interface CalendarDateToolbarProps {
+  date: string;
+  today: string;
+  view: "month" | "day" | "week";
+}
+
 const linkClass = "inline-flex min-h-11 min-w-11 items-center justify-center rounded-control border border-text-secondary px-3 text-sm font-semibold hover:bg-background";
 
-export function CalendarDateToolbar({ date, today, view }: { date: string; today: string; view: "month" | "day" | "week" }) {
+export function CalendarDateToolbar({ date, today, view }: CalendarDateToolbarProps) {
   const isMonth = view === "month";
   const isWeek = view === "week";
   const shift = isMonth ? adjacentMonth : isWeek ? adjacentWeek : adjacentDate;

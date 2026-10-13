@@ -1,14 +1,25 @@
-import type { ActivityStatus, CalendarItem } from "../../lib/calendar-types";
 import Link from "next/link";
+import type { ActivityStatus } from "../../models/calendar";
+import type { CalendarItem } from "../../models/calendar";
 
-export const activityStatuses: Record<ActivityStatus, { label: string; className: string }> = {
+interface ActivityRowProps {
+  item: CalendarItem;
+  id?: string;
+}
+
+interface ActivityStatusPresentation {
+  label: string;
+  className: string;
+}
+
+export const activityStatuses: Record<ActivityStatus, ActivityStatusPresentation> = {
   PENDING: { label: "Pendente", className: "bg-status-pending-soft text-status-pending" },
   IN_PROGRESS: { label: "Em andamento", className: "bg-status-in-progress-soft text-status-in-progress" },
   COMPLETED: { label: "Concluído", className: "bg-status-completed-soft text-status-completed" },
   CANCELED: { label: "Cancelado", className: "bg-status-canceled-soft text-status-canceled" },
 };
 
-export function ActivityRow({ item, id }: { item: CalendarItem; id?: string }) {
+export function ActivityRow({ item, id }: ActivityRowProps) {
   const status = activityStatuses[item.status];
   const origin = item.source === "RECURRING" ? "Recorrência" : item.templateApplicationId ? "Modelo semanal" : "Atividade avulsa";
   return (
@@ -29,4 +40,3 @@ export function ActivityRow({ item, id }: { item: CalendarItem; id?: string }) {
     </li>
   );
 }
-

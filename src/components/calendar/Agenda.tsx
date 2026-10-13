@@ -3,9 +3,15 @@ import { ActivityRow } from "./ActivityRow";
 import { CalendarDays } from "lucide-react";
 import { getCalendar } from "../../server/api/calendar";
 import { calendarHref, formatCalendarDate } from "../../lib/calendar-date";
-import type { CalendarItem, CalendarRange } from "../../lib/calendar-types";
+import type { CalendarItem } from "../../models/calendar";
+import type { CalendarRange } from "../../models/calendar";
 
-export async function Agenda({ range, today }: { range: CalendarRange; today: string }) {
+interface AgendaProps {
+  range: CalendarRange;
+  today: string;
+}
+
+export async function Agenda({ range, today }: AgendaProps) {
   const result = await getCalendar(range);
   if (!result.ok) {
     if (result.status === 401) redirect(result.code === "NO_SESSION" ? "/login" : "/login?reason=expired");

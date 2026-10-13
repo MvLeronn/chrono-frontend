@@ -1,10 +1,14 @@
-import type { ReactNode } from "react";
 import Link from "next/link";
 import { CalendarDays, Clock3, LogOut } from "lucide-react";
 import { logoutAction } from "../app/actions/session";
 import { Button } from "./ui/Button";
+import type { ReactNode } from "react";
 
-export function PrivateShell({ children }: { children: ReactNode }) {
+interface PrivateShellProps {
+  children: ReactNode;
+}
+
+export function PrivateShell({ children }: PrivateShellProps) {
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[14rem_minmax(0,1fr)]">
       <a href="#main-content" className="sr-only z-10 rounded-control bg-surface p-3 font-semibold text-primary focus:not-sr-only focus:absolute focus:left-4 focus:top-4">Pular para o conteúdo</a>

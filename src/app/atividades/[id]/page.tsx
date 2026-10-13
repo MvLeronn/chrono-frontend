@@ -4,7 +4,16 @@ import { getEvent } from "../../../server/api/events";
 import { dayHref, formatCalendarDate } from "../../../lib/calendar-date";
 import { activityStatuses } from "../../../components/calendar/ActivityRow";
 
-export default async function EventPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ created?: string }> }) {
+interface EventPageProps {
+  params: Promise<{
+    id: string;
+  }>;
+  searchParams: Promise<{
+    created?: string;
+  }>;
+}
+
+export default async function EventPage({ params, searchParams }: EventPageProps) {
   const { id } = await params;
   const result = await getEvent(id);
   if (!result.ok) {

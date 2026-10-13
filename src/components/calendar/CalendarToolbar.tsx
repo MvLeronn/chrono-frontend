@@ -1,14 +1,19 @@
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { calendarHref, defaultRange, shiftRange } from "../../lib/calendar-date";
-import type { CalendarRange } from "../../lib/calendar-types";
 import { Button } from "../ui/Button";
 import { Label } from "../ui/Label";
+import type { CalendarRange } from "../../models/calendar";
+
+interface CalendarToolbarProps {
+  range: CalendarRange;
+  today: string;
+}
 
 const navigationClass = "inline-flex min-h-11 min-w-11 items-center justify-center rounded-control border border-text-secondary bg-surface px-3 text-sm font-semibold hover:bg-background";
 const inputClass = "min-h-11 w-full min-w-0 rounded-control border border-text-secondary bg-surface px-3 py-2 text-base tabular-nums";
 
-export function CalendarToolbar({ range, today }: { range: CalendarRange; today: string }) {
+export function CalendarToolbar({ range, today }: CalendarToolbarProps) {
   const previous = shiftRange(range, -1);
   const next = shiftRange(range, 1);
   return (

@@ -7,7 +7,12 @@ import { layoutDayActivities } from "../../lib/day-layout";
 import { ActivityRow, activityStatuses } from "./ActivityRow";
 import { TimedActivityBlocks } from "./TimedActivityBlocks";
 
-export async function WeekView({ date, today }: { date: string; today: string }) {
+interface WeekViewProps {
+  date: string;
+  today: string;
+}
+
+export async function WeekView({ date, today }: WeekViewProps) {
   const range = weekRange(date);
   const result = await getCalendar(range);
   if (!result.ok) {

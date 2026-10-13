@@ -1,12 +1,12 @@
-import type { CalendarItem } from "./calendar-types";
+import type { CalendarItem } from "../models/calendar";
 
-type PositionedActivity = {
+export interface PositionedActivity {
   item: CalendarItem;
   start: number;
   visualEnd: number;
   column: number;
   columns: number;
-};
+}
 
 function minutes(time: string): number {
   const [hour, minute] = time.split(":").map(Number);

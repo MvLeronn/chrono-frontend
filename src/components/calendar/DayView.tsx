@@ -7,7 +7,11 @@ import { layoutDayActivities } from "../../lib/day-layout";
 import { TimedActivityBlocks } from "./TimedActivityBlocks";
 import { ActivityRow } from "./ActivityRow";
 
-export async function DayView({ date }: { date: string }) {
+interface DayViewProps {
+  date: string;
+}
+
+export async function DayView({ date }: DayViewProps) {
   const result = await getCalendar({ from: date, to: date });
   if (!result.ok) {
     if (result.status === 401) redirect(result.code === "NO_SESSION" ? "/login" : "/login?reason=expired");

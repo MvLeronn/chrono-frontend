@@ -44,6 +44,8 @@ O pedido posterior de trabalhar em etapas substitui a orientação anterior de e
 
 ### Regra de estilos
 
+**Organização de tipos:** organização híbrida aprovada pelo usuário após a etapa 8A, substituindo a centralização integral anterior. `src/models` contém somente domínio e contratos; tipos de transporte ficam em `src/server/api/types.ts`, props no próprio componente/página, estados de formulário em `state.ts` junto dos formulários e tipos de posicionamento/grade junto dos helpers. Usar `interface` para objetos, `type` para uniões/aliases/tipos derivados, propriedades em linhas separadas e imports somente de tipo. Validações permanecem fora dos models. A reorganização não altera o comportamento nem avança a etapa funcional.
+
 **Usar Tailwind nos componentes.** O `globals.css` deve conter apenas paleta, tokens e base do design system, como tipografia e foco. Não concentrar nele estilos de páginas, formulários, sidebar, calendário, cards ou modais.
 
 Centralizar variantes em componentes pequenos, como `Button` e controles de formulário. Evitar tanto classes duplicadas extensas quanto componentes genéricos com responsabilidades demais. CSS Modules só devem ser considerados para uma necessidade concreta do calendário que fique mais clara dessa forma.

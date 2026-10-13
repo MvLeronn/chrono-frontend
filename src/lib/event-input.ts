@@ -1,13 +1,10 @@
 import { parseCalendarDate } from "./calendar-date";
-import type { ActivityStatus, ActivityType } from "./calendar-types";
+import type { EventDraft, EventFormErrors } from "../app/atividades/nova/state";
 
-export type EventDraft = { title: string; type: string; date: string; startTime: string; endTime: string; description: string; status: string };
-export type CreateEventInput = { title: string; type: ActivityType; date: string; startTime: string | null; endTime: string | null; description: string | null; status: ActivityStatus };
-export type EventFormState = { errors?: Partial<Record<keyof EventDraft, string>>; message?: string; uncertain?: boolean; expired?: boolean };
 export const isLocalTime = (value: string) => /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 
-export function validateEvent(draft: EventDraft): NonNullable<EventFormState["errors"]> {
-  const errors: NonNullable<EventFormState["errors"]> = {};
+export function validateEvent(draft: EventDraft): EventFormErrors {
+  const errors: EventFormErrors = {};
   if (!draft.title.trim() || draft.title.trim().length > 200) errors.title = "Informe um título de até 200 caracteres.";
   if (!["TASK", "EVENT"].includes(draft.type)) errors.type = "Escolha tarefa ou evento.";
   if (!parseCalendarDate(draft.date)) errors.date = "Informe uma data válida entre 0001 e 9999.";

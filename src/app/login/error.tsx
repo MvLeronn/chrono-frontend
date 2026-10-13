@@ -2,7 +2,11 @@
 
 import { Button } from "../../components/ui/Button";
 
-export default function LoginError({ reset }: { reset: () => void }) {
+interface LoginErrorProps {
+  reset: () => void;
+}
+
+export default function LoginError({ reset }: LoginErrorProps) {
   return (
     <main className="flex min-h-dvh items-center justify-center p-4">
       <section className="w-full max-w-100 space-y-6 rounded-surface border border-border bg-surface p-6">

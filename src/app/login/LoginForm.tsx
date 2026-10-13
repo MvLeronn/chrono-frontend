@@ -10,9 +10,13 @@ import { passwordError } from "../../lib/password-validation";
 import { loginAction } from "./actions";
 import type { LoginState } from "./state";
 
+interface LoginFormProps {
+  notice?: string;
+}
+
 const initialState: LoginState = {};
 
-export function LoginForm({ notice }: { notice?: string }) {
+export function LoginForm({ notice }: LoginFormProps) {
   const [state, formAction, pending] = useActionState(loginAction, initialState);
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);

@@ -4,7 +4,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "../../../server/api/auth";
 import { createEvent } from "../../../server/api/events";
-import { validateEvent, type CreateEventInput, type EventDraft, type EventFormState } from "../../../lib/event-input";
+import { validateEvent } from "../../../lib/event-input";
+import type { EventDraft, EventFormState } from "./state";
+import type { CreateEventInput } from "../../../models/event";
 
 export async function createEventAction(_previous: EventFormState, formData: FormData): Promise<EventFormState> {
   const session = await getCurrentUser();

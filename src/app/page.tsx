@@ -15,7 +15,16 @@ import { WeekView } from "../components/calendar/WeekView";
 import { newEventHref } from "../lib/event-input";
 import { calendarHref, dayHref, defaultRange, formatCalendarDate, isValidRange, monthHref, parseCalendarDate, todayInTimezone, weekHref, weekRange } from "../lib/calendar-date";
 
-export default async function HomePage({ searchParams }: { searchParams: Promise<{ view?: string | string[]; date?: string | string[]; from?: string | string[]; to?: string | string[] }> }) {
+interface HomePageProps {
+  searchParams: Promise<{
+    view?: string | string[];
+    date?: string | string[];
+    from?: string | string[];
+    to?: string | string[];
+  }>;
+}
+
+export default async function HomePage({ searchParams }: HomePageProps) {
   const session = await getCurrentUser();
   if (!session.ok && session.status === 401) {
     redirect(session.code === "NO_SESSION" ? "/login" : "/login?reason=expired");

@@ -1,7 +1,8 @@
 import "server-only";
-import type { CalendarItem, CalendarRange, CalendarResponse } from "../../lib/calendar-types";
 import { isValidRange, parseCalendarDate } from "../../lib/calendar-date";
-import { invalidResponse, isRecord, requestApi, type ApiResult } from "./request";
+import { invalidResponse, isRecord, requestApi } from "./request";
+import type { CalendarRange, CalendarItem, CalendarResponse } from "../../models/calendar";
+import type { ApiResult } from "./types";
 
 const isUuid = (value: unknown): value is string => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 const isDate = (value: unknown): value is string => typeof value === "string" && parseCalendarDate(value) !== null;

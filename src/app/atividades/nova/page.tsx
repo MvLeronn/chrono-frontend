@@ -4,7 +4,14 @@ import { isLocalTime } from "../../../lib/event-input";
 import { EventForm } from "./EventForm";
 import { redirect } from "next/navigation";
 
-export default async function NewEventPage({ searchParams }: { searchParams: Promise<{ date?: string; time?: string }> }) {
+interface NewEventPageProps {
+  searchParams: Promise<{
+    date?: string;
+    time?: string;
+  }>;
+}
+
+export default async function NewEventPage({ searchParams }: NewEventPageProps) {
   const session = await getCurrentUser();
   if (!session.ok && session.status === 401) redirect("/login?reason=expired");
   if (!session.ok) return <div className="space-y-4"><h1 className="text-2xl font-semibold">Não foi possível abrir o formulário</h1><p role="alert">O serviço está indisponível. Tente novamente em instantes.</p><a href="" className="inline-flex min-h-11 items-center text-primary underline">Tentar novamente</a></div>;

@@ -1,8 +1,7 @@
 import "server-only";
-import { invalidResponse, isRecord, requestApi, type ApiResult } from "./request";
-
-export type PublicUser = { id: string; timezone: string };
-type LoginResponse = { token: string; tokenType: "Bearer"; expiresIn: number; user: PublicUser };
+import { invalidResponse, isRecord, requestApi } from "./request";
+import type { PublicUser, LoginResponse } from "../../models/auth";
+import type { ApiResult } from "./types";
 
 function isUser(value: unknown): value is PublicUser {
   if (!isRecord(value) || typeof value.id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value.id) || typeof value.timezone !== "string" || !value.timezone) return false;

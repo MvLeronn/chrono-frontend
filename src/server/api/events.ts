@@ -1,8 +1,9 @@
 import "server-only";
-import type { EventResponse } from "../../lib/calendar-types";
-import type { CreateEventInput } from "../../lib/event-input";
 import { isCalendarItem } from "./calendar";
-import { invalidResponse, requestApi, type ApiResult } from "./request";
+import { invalidResponse, requestApi } from "./request";
+import type { EventResponse } from "../../models/calendar";
+import type { CreateEventInput } from "../../models/event";
+import type { ApiResult } from "./types";
 
 export async function createEvent(input: CreateEventInput): Promise<ApiResult<EventResponse>> {
   const result = await requestApi({ path: "events", input });

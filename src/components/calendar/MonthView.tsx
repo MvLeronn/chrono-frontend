@@ -3,12 +3,17 @@ import { newEventHref } from "../../lib/event-input";
 import { redirect } from "next/navigation";
 import { getCalendar } from "../../server/api/calendar";
 import { calendarHref, dayHref, formatCalendarDate, monthGrid, monthHref } from "../../lib/calendar-date";
-import type { CalendarItem } from "../../lib/calendar-types";
 import { ActivityRow, activityStatuses } from "./ActivityRow";
+import type { CalendarItem } from "../../models/calendar";
+
+interface MonthViewProps {
+  date: string;
+  today: string;
+}
 
 const weekdays = ["segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado", "domingo"];
 
-export async function MonthView({ date, today }: { date: string; today: string }) {
+export async function MonthView({ date, today }: MonthViewProps) {
   const { days, range } = monthGrid(date);
   const result = await getCalendar(range);
   if (!result.ok) {

@@ -1,12 +1,12 @@
-import type { ReactNode } from "react";
 import { CircleAlert } from "lucide-react";
+import type { ReactNode } from "react";
 
-type FieldErrorProps = {
+interface FieldErrorProps {
   id?: string;
   role?: "alert";
   children: ReactNode;
   className?: string;
-};
+}
 
 export function FieldError({ id, role, children, className = "" }: FieldErrorProps) {
   return (

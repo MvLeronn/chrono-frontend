@@ -1,4 +1,9 @@
-import type { CalendarRange } from "./calendar-types";
+import type { CalendarRange } from "../models/calendar";
+
+export interface MonthGrid {
+  days: (string | null)[];
+  range: CalendarRange;
+}
 
 // Civil dates use UTC only for arithmetic and formatting, never as local instants.
 export function parseCalendarDate(value: string): Date | null {
@@ -92,7 +97,7 @@ export function adjacentMonth(value: string, direction: -1 | 1): string | null {
   return date.toISOString().slice(0, 10);
 }
 
-export function monthGrid(value: string): { days: (string | null)[]; range: CalendarRange } {
+export function monthGrid(value: string): MonthGrid {
   const first = `${value.slice(0, 7)}-01`;
   const date = parseCalendarDate(first);
   if (!date) throw new Error("Invalid month");

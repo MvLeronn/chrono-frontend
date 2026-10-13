@@ -1,6 +1,9 @@
-import type { AriaAttributes, ChangeEventHandler, Ref } from "react";
 
-type InputProps = {
+import type { AriaAttributes } from "react";
+import type { ChangeEventHandler } from "react";
+import type { Ref } from "react";
+
+interface InputProps {
   id: string;
   name?: string;
   type?: "text" | "password";
@@ -18,7 +21,7 @@ type InputProps = {
   onChange?: ChangeEventHandler<HTMLInputElement>;
   "aria-invalid"?: AriaAttributes["aria-invalid"];
   "aria-describedby"?: string;
-};
+}
 
 export function Input({
   id,

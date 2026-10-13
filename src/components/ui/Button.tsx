@@ -1,7 +1,8 @@
-import type { MouseEventHandler, ReactNode } from "react";
 import { LoaderCircle } from "lucide-react";
+import type { ReactNode } from "react";
+import type { MouseEventHandler } from "react";
 
-type ButtonProps = {
+interface ButtonProps {
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
   className?: string;
@@ -10,7 +11,7 @@ type ButtonProps = {
   variant?: "primary" | "secondary";
   loading?: boolean;
   loadingLabel?: string;
-};
+}
 
 const variants = {
   primary: "border-primary bg-primary text-text-on-primary enabled:hover:border-primary-hover enabled:hover:bg-primary-hover",

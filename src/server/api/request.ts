@@ -1,17 +1,7 @@
 import "server-only";
 import { getApiBaseUrl } from "../env";
 import { readSessionToken } from "../auth/session";
-import type { CreateEventInput } from "../../lib/event-input";
-
-export type ApiFailure = {
-  ok: false;
-  status: number | null;
-  code: string;
-  message: string;
-  details?: unknown;
-};
-
-export type ApiResult<T> = { ok: true; status: number; data: T } | ApiFailure;
+import type { ApiFailure, ApiResult, ApiRequest } from "./types";
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -20,14 +10,6 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
 export function invalidResponse(status: number): ApiFailure {
   return { ok: false, status, code: "INVALID_RESPONSE", message: "O serviço retornou uma resposta inesperada. Tente novamente." };
 }
-
-// Paths and payloads are selected by server wrappers, never by the browser.
-type ApiRequest =
-  | { path: "auth/login"; password: string }
-  | { path: "auth/me" }
-  | { path: "calendar"; from: string; to: string }
-  | { path: "events"; input: CreateEventInput }
-  | { path: "event-detail"; id: string };
 
 export async function requestApi(request: ApiRequest): Promise<ApiResult<unknown>> {
   const headers = new Headers({ Accept: "application/json" });

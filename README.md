@@ -78,7 +78,11 @@ O detalhe da regra oferece `/recorrencias/[id]/encerrar` (etapa 10C). A data de 
 
 POST `/recurring-events/:id/end` envia apenas `fromDate`, valida resposta 200 e identidade/limite do trecho. A action verifica sessão e dados atuais; mudanças desde a abertura exigem nova consulta. Conflitos exibem datas/status validados e links para consultar ocorrências em outra aba, sem apagar estados. Data e confirmação permanecem em falhas; mudar a data exige nova confirmação. Sucesso atualiza calendário/lista/detalhe e distingue limite alterado de limite mantido. Não há retry automático.
 
-Validação da etapa 10C: TypeScript, lint, build e conferência do diff registrados no plano. Nenhum teste automatizado novo. Encerramento autenticado, conflitos reais e inspeção visual de desktop/mobile, teclado, foco e zoom permanecem pendentes. A consulta prévia não substitui controle de versão atômico, que o contrato não oferece. Próxima etapa: 11A, modelos semanais, após revisão.
+`/modelos` lista modelos semanais ativos com paginação por URL; `/modelos/nova` cria uma definição com nome e até 200 itens, inclusive vazia (etapa 11A). Cada item tem dia da semana, categoria, título, descrição e horários opcionais. Chaves locais mantêm o preenchimento ao adicionar/remover itens e não são enviadas ao backend. A validação client/server também verifica o limite total de 100 KB do JSON aceito pela API. Criar um modelo não adiciona atividades ao calendário.
+
+POST `/week-templates` envia somente os campos contratados, valida resposta 201 e redireciona para `/modelos/[id]`, com nova leitura no servidor. O detalhe apresenta os itens por dia da semana. Falhas preservam o formulário; sessão expirada permite login em outra aba, e resultado incerto orienta conferir a lista antes de repetir, pois a criação não é idempotente. Alterar um modelo não modifica cópias já criadas. Edição de modelos salvos, aplicação e arquivamento ficam nas próximas subetapas.
+
+Validação da etapa 11A: TypeScript, lint, build e conferência do diff registrados no plano. Nenhum teste automatizado novo. Listagem/criação/detalhe autenticados e inspeção visual de desktop/mobile, teclado, foco e zoom permanecem pendentes. Próxima etapa: 11B, edição de nome/itens, após revisão do editor.
 
 O Yarn informa um peer transitivo ausente de `eslint` em `@next/eslint-plugin-next`, embora o projeto forneça ESLint. O lint deve ser validado antes de aceitar futuras atualizações. O aviso de scripts bloqueados de `unrs-resolver` é esperado pela política de instalação.
 

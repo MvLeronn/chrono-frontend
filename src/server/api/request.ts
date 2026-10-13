@@ -34,13 +34,15 @@ export async function requestApi(request: ApiRequest): Promise<ApiResult<unknown
       : request.path === "recurring-split" ? `recurring-events/${encodeURIComponent(request.id)}/split`
       : request.path === "recurring-detail" ? `recurring-events/${encodeURIComponent(request.id)}`
       : request.path === "recurring-list" || request.path === "recurring-create" ? "recurring-events"
+      : request.path === "template-detail" ? `week-templates/${encodeURIComponent(request.id)}`
+      : request.path === "template-list" || request.path === "template-create" ? "week-templates"
       : "id" in request ? `events/${encodeURIComponent(request.id)}` : request.path;
     const url = new URL(path, base);
     if (request.path === "calendar") {
       url.searchParams.set("from", request.from);
       url.searchParams.set("to", request.to);
     }
-    if (request.path === "recurring-list") {
+    if (request.path === "recurring-list" || request.path === "template-list") {
       url.searchParams.set("page", String(request.page));
       url.searchParams.set("limit", String(request.limit));
     }

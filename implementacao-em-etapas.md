@@ -409,6 +409,17 @@ Executar uma subetapa por vez:
 
 Não enviar IDs internos no payload dos itens. Explicar que editar um modelo não altera eventos já criados.
 
+### Entrega da etapa 11A — aguardando revisão
+
+- Pedido de iniciar a próxima etapa autoriza listagem, criação e detalhe de modelos semanais. Implementadas `/modelos`, `/modelos/nova` e `/modelos/[id]`, com navegação privada, fonte local, tokens e controles existentes. Editor em uma coluna no mobile e duas para campos curtos; detalhe organiza a semana de segunda a domingo em superfície contínua.
+- Lista paginada por `page`/`limit` (padrão 20), preservando ordem da API, com validação de parâmetros, vazio inicial, página além do total e recuperação de falha. Consulta e detalhe usam `no-store`; 401 redireciona ao login e 404 informa modelo indisponível/arquivado.
+- Editor cria nome e 0–200 itens, com categoria, título, dia semanal, descrição e horários opcionais. Chaves locais estáveis preservam os campos ao remover itens; adicionar/remover direciona foco. Modelo vazio é permitido e nenhuma atividade é criada no calendário. Edição de modelos salvos, aplicação e arquivamento não foram antecipados.
+- Validação compartilhada confere campos, horários e tamanho do JSON no limite documentado de 100 KB do backend. Payload explícito omite chaves locais, IDs, status e datas concretas. A action revalida sessão e dados, exige resposta 201 estruturalmente válida, invalida lista e abre detalhe fresco.
+- Preenchimento preservado em erros, envio simultâneo bloqueado e recuperação de sessão em outra aba. Resultado incerto orienta conferir a lista antes de repetir; nomes duplicados são permitidos pela API, sem idempotência ou retry automático.
+- Arquivos: `src/app/modelos/{layout.tsx,page.tsx,nova/*,[id]/page.tsx}`, `src/models/template.ts`, `src/lib/template-input.ts`, `src/server/api/templates.ts`, transporte/tipos, navegação privada e README.
+- Verificações: `yarn typecheck`, `yarn lint`, `yarn build` e `git diff --check`. Nenhum teste automatizado, dependência nova ou alteração de backend.
+- Limites: listagem/criação/detalhe autenticados, paginação real e inspeção visual (desktop/mobile, foco, teclado, zoom) não reproduzidos. A recusa anterior de acesso local foi preservada. Próximo passo: revisão do editor de 11A antes de autorizar 11B (edição de nome/itens).
+
 ## Etapa 12 — revisão integrada e documentação
 
 **Entrega:** revisão final dos fluxos já implementados, sem expansão de escopo.
@@ -436,4 +447,4 @@ Preencher ao concluir cada etapa:
 
 Situações sugeridas: não iniciada, em implementação, aguardando revisão, aprovada.
 
-**Próxima ação:** revisar a etapa 10C implementada. A etapa 11A (listagem, criação e detalhe de modelos semanais) depende de nova autorização. Os registros anteriores são históricos; a continuidade atual está na entrega 10C.
+**Próxima ação:** revisar a etapa 11A implementada, especialmente o editor de itens. A etapa 11B (edição de nome/itens de modelos salvos) depende de nova autorização. Os registros anteriores são históricos; a continuidade atual está na entrega 11A.

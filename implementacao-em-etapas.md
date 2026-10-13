@@ -442,6 +442,16 @@ Não enviar IDs internos no payload dos itens. Explicar que editar um modelo nã
 - Verificações: `yarn typecheck`, `yarn lint`, `yarn build` e `git diff --check`. Revisão estática dos limites civis, payload, respostas 200/201 e distinção de datas atuais versus semana da aplicação.
 - Limites: primeira aplicação/reaplicação autenticadas, eventos alterados/removidos, modelo vazio e inspeção visual (desktop/mobile, foco, teclado, zoom) não reproduzidos. Consulta prévia não garante atomicidade contra edição concorrente do modelo. Próximo passo: revisão de 11C antes de autorizar 11D (arquivamento).
 
+### Entrega da etapa 11D — aguardando revisão
+
+- Arquivamento disponível no detalhe do modelo, em expansão nativa com nome, checkbox obrigatório e botão de ação destrutiva. A confirmação explica que o modelo deixa de estar disponível para consulta, edição e aplicação/reaplicação, sem restauração; atividades, itens e aplicações anteriores são preservados.
+- Server Action verifica confirmação, sessão e modelo fresco, exigindo revisão se `updatedAt` mudou. DELETE `/week-templates/:id` não envia body e exige 204, tratado sem parsing de JSON. Não há retry automático nem restauração fictícia.
+- Confirmação controlada permanece em falhas; envios simultâneos bloqueados, foco no erro e recuperação por login/consulta em outra aba. 404 informa indisponibilidade ou arquivamento anterior, sem alegar novo sucesso. Modelo alterado/indisponível bloqueia novo envio naquele formulário.
+- Sucesso invalida lista, detalhe, edição e aplicação, e redireciona para `/modelos?archived=1` com confirmação de preservação das atividades. Estado vazio da lista informa ausência de modelos disponíveis, inclusive após arquivar o último.
+- Arquivos: `src/app/modelos/[id]/{ArchiveTemplateForm.tsx,actions.ts,archive-state.ts,page.tsx}`, listagem, `src/server/api/{templates,request,types}.ts`, README e plano. Nenhum modelo real foi arquivado pela ferramenta; nenhuma dependência, teste automatizado ou alteração no backend.
+- Verificações: `yarn typecheck`, `yarn lint`, `yarn build` e `git diff --check`. Revisão estática do DELETE sem body, resposta 204, confirmação e estados de falha.
+- Limites: arquivamento autenticado, preservação real de cópias e inspeção visual (desktop/mobile, foco, teclado, zoom) não reproduzidos. Leitura prévia não garante atomicidade contra edição concorrente. Próximo passo: revisão de 11D antes de autorizar a etapa 12 (revisão integrada).
+
 ## Etapa 12 — revisão integrada e documentação
 
 **Entrega:** revisão final dos fluxos já implementados, sem expansão de escopo.
@@ -469,4 +479,4 @@ Preencher ao concluir cada etapa:
 
 Situações sugeridas: não iniciada, em implementação, aguardando revisão, aprovada.
 
-**Próxima ação:** revisar a etapa 11C implementada. A etapa 11D (arquivamento com preservação das cópias) depende de nova autorização. Os registros anteriores são históricos; a continuidade atual está na entrega 11C.
+**Próxima ação:** revisar a etapa 11D implementada. A etapa 12 (revisão integrada e documentação) depende de nova autorização. Os registros anteriores são históricos; a continuidade atual está na entrega 11D.

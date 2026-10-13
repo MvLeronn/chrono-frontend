@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTemplate } from "../../../server/api/templates";
 import { weekdays } from "../../../lib/template-input";
+import { ArchiveTemplateForm } from "./ArchiveTemplateForm";
 
 interface TemplatePageProps {
   params: Promise<{
@@ -35,5 +36,6 @@ export default async function TemplatePage({ params, searchParams }: TemplatePag
       const entries = item.items.filter((entry) => entry.weekday === index + 1);
       return <section key={day} aria-labelledby={`weekday-${index}`} className="grid gap-3 py-5 sm:grid-cols-[9rem_minmax(0,1fr)]"><h2 id={`weekday-${index}`} className="text-sm font-semibold text-primary">{day}</h2>{entries.length ? <ul className="min-w-0 space-y-5">{entries.map((entry) => <li key={entry.id} className="space-y-1"><p className="text-xs text-text-secondary">{entry.type === "TASK" ? "Tarefa" : "Evento"} · <span className="tabular-nums">{entry.startTime ? `${entry.startTime}${entry.endTime ? ` – ${entry.endTime}` : " · Sem horário de fim"}` : "Sem horário"}</span></p><h3 className="wrap-anywhere font-semibold">{entry.title}</h3>{entry.description && <p className="wrap-anywhere whitespace-pre-wrap text-sm text-text-secondary">{entry.description}</p>}</li>)}</ul> : <p className="text-sm text-text-secondary">Sem itens</p>}</section>;
     })}</div>}
+    <ArchiveTemplateForm id={id} name={item.name} updatedAt={item.updatedAt} />
   </div>;
 }

@@ -54,6 +54,13 @@ export async function updateTemplate(id: string, input: UpdateTemplateInput): Pr
   return { ok: true, status: 200, data: result.data };
 }
 
+export async function archiveTemplate(id: string): Promise<ApiResult<null>> {
+  const result = await requestApi({ path: "template-archive", id });
+  if (!result.ok) return result;
+  if (result.status !== 204) return invalidResponse(result.status);
+  return { ok: true, status: 204, data: null };
+}
+
 export async function applyTemplate(id: string, weekStart: string): Promise<ApiResult<ApplyTemplateResponse>> {
   const weekEnd = templateWeekEnd(weekStart);
   if (!weekEnd) return { ok: false, status: 400, code: "INVALID_WEEK_START", message: "Escolha uma segunda-feira cuja semana termine até 31/12/9999." };

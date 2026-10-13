@@ -72,7 +72,7 @@ export type ApiRequest = {
   page: number;
   limit: number;
 } | {
-  path: "template-detail";
+  path: "template-detail" | "template-archive";
   id: string;
 } | {
   path: "template-create";

@@ -57,3 +57,32 @@ export function shiftRange(range: CalendarRange, direction: -1 | 1): CalendarRan
 export function calendarHref(range: CalendarRange): string {
   return `/?from=${range.from}&to=${range.to}`;
 }
+
+export function monthHref(date: string): string {
+  return `/?view=month&date=${date}`;
+}
+
+export function adjacentMonth(value: string, direction: -1 | 1): string | null {
+  const date = parseCalendarDate(value);
+  if (!date) return null;
+  date.setUTCDate(1);
+  date.setUTCMonth(date.getUTCMonth() + direction);
+  if (date.getUTCFullYear() < 1 || date.getUTCFullYear() > 9999) return null;
+  return date.toISOString().slice(0, 10);
+}
+
+export function monthGrid(value: string): { days: (string | null)[]; range: CalendarRange } {
+  const first = `${value.slice(0, 7)}-01`;
+  const date = parseCalendarDate(first);
+  if (!date) throw new Error("Invalid month");
+  const leading = (date.getUTCDay() + 6) % 7;
+  date.setUTCMonth(date.getUTCMonth() + 1);
+  date.setUTCDate(0);
+  const count = date.getUTCDate();
+  const length = Math.ceil((leading + count) / 7) * 7;
+  const days = Array.from({ length }, (_, index) => adjacentDate(first, index - leading));
+  return {
+    days,
+    range: { from: days.find((day) => day !== null)!, to: days.findLast((day) => day !== null)! },
+  };
+}

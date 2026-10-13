@@ -243,6 +243,17 @@ Cada subetapa exige uma entrega e uma revisão próprias:
 - Destaques distintos para hoje e dia selecionado.
 - Títulos longos, indicador de atividades excedentes e acesso à lista completa do dia.
 
+#### Entrega da etapa 7A — aguardando revisão
+
+- Implementada alternância entre Agenda e Mês na página principal, preservando Agenda como padrão. O mês usa `/?view=month&date=YYYY-MM-DD`; links, seleção de data e nova tentativa preservam essa visualização. Somente 7A foi executada, sem grade diária/semanal ou criação/edição.
+- `MonthToolbar.tsx` permite anterior/próximo/hoje e seleção nativa de data. `monthGrid`, `adjacentMonth` e `monthHref` em `src/lib/calendar-date.ts` calculam semanas completas iniciadas na segunda-feira, com aritmética UTC e consulta dos dias adjacentes exibidos. Nas bordas 0001–9999, posições sem data válida ficam vazias e navegação fora do limite é desabilitada.
+- `MonthView.tsx` consulta a API uma vez por render no servidor, reutilizando validação/ordenação existentes. Cada célula mostra até três atividades no desktop, com título limitado a duas linhas, horário e status textual; quantidade excedente abre a lista completa do dia abaixo da grade. No mobile, a célula mostra data/quantidade e o detalhe completo permanece acessível abaixo. Selecionar um dia adjacente abre seu respectivo mês.
+- Hoje usa número branco sobre círculo petróleo; seleção usa fundo azul claro e contorno, com indicação textual no detalhe e `aria-current` no link. Tabela semântica, links nativos, formulário rotulado e âncora focável para a lista do dia. Não foram criadas interações de drag ou semântica de grid que exigisse teclado customizado.
+- `ActivityRow.tsx` extrai a apresentação já existente na agenda para compartilhar o detalhe completo, incluindo descrição, categoria e origem. Chaves de atividades continuam sendo `calendarKey`, inclusive ocorrências virtuais. Nenhum endpoint, dependência ou teste automatizado novo.
+- Verificações concluídas: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check`. Inspeção pontual dos helpers via Node exibiu intervalos corretos para 0001-01, 0099-12/0100-01, fevereiro de 0100/2024/2026, virada 2026/2027 e dezembro de 9999. Todas as semanas observadas começam na segunda-feira; o limite superior deixa duas células vazias sem consultar o ano 10000.
+- Limites: consulta autenticada, densidade real de atividades, foco/rolagem da âncora, desktop/mobile, zoom e navegação por teclado não foram reproduzidos no navegador. A recusa anterior de acesso local foi respeitada; responsividade e acessibilidade foram revisadas no código. Nenhum dado fictício adicionado para substituir a integração.
+- Próximo passo: revisão da visualização mensal pelo usuário; somente após autorização, etapa 7B (dia).
+
 ### 7B — dia
 
 - Separar atividades sem horário da grade horária.

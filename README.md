@@ -1,6 +1,6 @@
 # Chrono frontend
 
-Base em Next.js App Router, React e TypeScript estrito, com Tailwind CSS e Lucide. Login, consulta de sessão e logout local estão integrados. A etapa 6 implementa a agenda por período com leitura real no servidor, agrupamento por dia e estados de carregamento, vazio e falha. Criação e grades serão implementadas nas etapas seguintes.
+Base em Next.js App Router, React e TypeScript estrito, com Tailwind CSS e Lucide. Login, consulta de sessão e logout local estão integrados. Agenda por período e visualização mensal usam leitura real no servidor, com estados de carregamento, vazio e falha. A etapa 7A adiciona a grade mensal; criação e grades diária/semanal permanecem nas etapas seguintes.
 
 ## Ambiente e instalação
 
@@ -40,7 +40,9 @@ A raiz e o login consultam `GET /auth/me` no servidor para conferir a sessão. U
 
 `src/server/api/calendar.ts` consulta `GET /calendar` com autenticação e `no-store`, valida a resposta e ordena por data, horário e `calendarKey`. A agenda exibe todos os status e distingue categoria de origem, inclusive cópias de modelos e ocorrências virtuais. Não há busca no mount, proxy público ou token nas props. A nova tentativa de falha preserva o período.
 
-Validação da etapa 6: lint, TypeScript, build e diff conferidos; sem testes automatizados novos. A consulta autenticada e seus estados não foram reproduzidos contra a API nesta etapa. A recusa de acesso ao navegador local registrada na etapa 5 foi respeitada; desktop/mobile, teclado e zoom permanecem pendentes. A agenda aguarda revisão antes da grade mensal (7A).
+O seletor Agenda/Mês preserva a agenda como padrão. O mês usa `/?view=month&date=YYYY-MM-DD`, semanas iniciadas na segunda-feira e consulta também os dias adjacentes visíveis. `MonthToolbar.tsx` controla a navegação; `MonthView.tsx` exibe até três atividades por célula e a lista completa do dia selecionado abaixo da grade. No mobile, as células priorizam data e quantidade. `ActivityRow.tsx` compartilha a apresentação completa com a agenda.
+
+Validação da etapa 7A: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check` passaram; sem testes automatizados novos. Uma inspeção pontual dos cálculos de data conferiu fevereiro bissexto/não bissexto, viradas de ano e limites 0001–9999. A consulta autenticada e a interação visual não foram reproduzidas. A recusa anterior de acesso ao navegador local foi respeitada; desktop/mobile, teclado, foco e zoom permanecem pendentes. O mês aguarda revisão antes da etapa 7B (dia).
 
 O Yarn informa um peer transitivo ausente de `eslint` em `@next/eslint-plugin-next`, embora o projeto forneça ESLint. O lint deve ser validado antes de aceitar futuras atualizações. O aviso de scripts bloqueados de `unrs-resolver` é esperado pela política de instalação.
 

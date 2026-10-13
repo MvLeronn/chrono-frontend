@@ -8,9 +8,11 @@ import { Suspense } from "react";
 import { Agenda } from "../components/calendar/Agenda";
 import { AgendaLoading } from "../components/calendar/AgendaLoading";
 import { CalendarToolbar } from "../components/calendar/CalendarToolbar";
-import { defaultRange, formatCalendarDate, isValidRange, parseCalendarDate, todayInTimezone } from "../lib/calendar-date";
+import { MonthToolbar } from "../components/calendar/MonthToolbar";
+import { MonthView } from "../components/calendar/MonthView";
+import { calendarHref, defaultRange, formatCalendarDate, isValidRange, monthHref, parseCalendarDate, todayInTimezone } from "../lib/calendar-date";
 
-export default async function HomePage({ searchParams }: { searchParams: Promise<{ date?: string | string[]; from?: string | string[]; to?: string | string[] }> }) {
+export default async function HomePage({ searchParams }: { searchParams: Promise<{ view?: string | string[]; date?: string | string[]; from?: string | string[]; to?: string | string[] }> }) {
   const session = await getCurrentUser();
   if (!session.ok && session.status === 401) {
     redirect(session.code === "NO_SESSION" ? "/login" : "/login?reason=expired");
@@ -24,16 +26,25 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
     const hasRange = params.from !== undefined || params.to !== undefined;
     const invalidRange = hasRange ? !candidate || !isValidRange(candidate) : params.date !== undefined && legacyDate === today && params.date !== today;
     const range = candidate && isValidRange(candidate) ? candidate : defaultRange(legacyDate);
+    const isMonth = params.view === "month";
+    const invalidMonthDate = params.date !== undefined && !(typeof params.date === "string" && parseCalendarDate(params.date));
+    const viewLinkClass = "inline-flex min-h-11 items-center justify-center rounded-control px-4 text-sm font-semibold";
 
     return (
       <PrivateShell>
         <header className="mb-6 space-y-1">
           <h1 id="calendar-title" className="text-2xl font-semibold leading-8">Calendário</h1>
-          <p className="text-text-secondary">Agenda de eventos e tarefas.</p>
+          <p className="text-text-secondary">Seus eventos e tarefas.</p>
         </header>
+        <nav aria-label="Visualização do calendário" className="mb-4 flex gap-2">
+          <Link href={calendarHref(isMonth ? defaultRange(legacyDate) : range)} prefetch={false} aria-current={!isMonth ? "page" : undefined} className={`${viewLinkClass} ${!isMonth ? "bg-primary text-text-on-primary" : "border border-text-secondary bg-surface hover:bg-background"}`}>Agenda</Link>
+          <Link href={monthHref(isMonth ? legacyDate : range.from)} prefetch={false} aria-current={isMonth ? "page" : undefined} className={`${viewLinkClass} ${isMonth ? "bg-primary text-text-on-primary" : "border border-text-secondary bg-surface hover:bg-background"}`}>Mês</Link>
+        </nav>
         <section aria-labelledby="calendar-title" className="overflow-hidden rounded-surface border border-border bg-surface">
-          <CalendarToolbar range={range} today={today} />
-          {invalidRange ? (
+          {isMonth ? <MonthToolbar date={legacyDate} today={today} /> : <CalendarToolbar range={range} today={today} />}
+          {isMonth ? (
+            invalidMonthDate ? <p role="alert" className="px-4 py-8 text-sm text-error sm:px-6">Data inválida. Escolha uma data entre 0001 e 9999 para consultar o mês.</p> : <Suspense key={`month:${legacyDate}`} fallback={<AgendaLoading />}><MonthView date={legacyDate} today={today} /></Suspense>
+          ) : invalidRange ? (
             <p role="alert" className="px-4 py-8 text-sm text-error sm:px-6">Período inválido. Escolha datas entre 0001 e 9999, com o fim igual ou posterior ao início e no máximo 366 dias. Ajuste os campos acima para consultar a agenda.</p>
           ) : (
             <>

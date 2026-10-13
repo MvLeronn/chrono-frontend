@@ -464,7 +464,7 @@ Não enviar IDs internos no payload dos itens. Explicar que editar um modelo nã
 - Atualizar README com instalação, ambiente, comandos, arquitetura e limitações reais.
 - Registrar operações não verificadas por indisponibilidade da API ou ausência de acesso.
 
-### Entrega da etapa 12 — revisão estática concluída; validação manual pendente
+### Entrega da etapa 12 — revisão estática e validação manual principal concluídas
 
 - Revisados código de autenticação/transporte, contratos de atividades, invalidação após mutações, editores, confirmações, recuperação de falhas e componentes do calendário. Preservados tokens, tipografia, controles, limites de escopo e ausência de dependências/testes novos.
 - Corrigida a mensagem de erro raiz, antes exclusiva do calendário; adicionado foco às falhas gerais de login; confirmação de exclusão concreta agora controlada para permanecer em erros. Validador compartilhado confere a equivalência entre status Concluído e `completedAt` não nulo.
@@ -474,6 +474,17 @@ Não enviar IDs internos no payload dos itens. Explicar que editar um modelo nã
 - Acessibilidade/responsividade revisadas no código: controles nativos, labels, erros associados, foco visível, status textual, movimento reduzido, rolagem restrita às grades e preservação de campos. Confirmações usam expansão nativa, sem modais customizados ou necessidade de trap de foco/Escape. Não foram encontrados artefatos demonstrativos em `src` a remover.
 - README atualizado com escopo implementado, correções e matriz de validação. Mantidos instalação, configuração privada, comandos e limitações de concorrência. Nenhum dado real alterado, servidor iniciado ou backend modificado.
 - Pendências: fluxos autenticados de todos os módulos, falhas de rede/expiração, conflitos e concorrência; inspeção de desktop/mobile, 320 px, zoom 200%, teclado, foco real e leitor de tela. A restrição de acesso local registrada anteriormente foi preservada. Revisão estática não é aprovação visual nem confirmação de funcionamento ponta a ponta; a etapa aguarda revisão e validação manual.
+
+### Validação manual da etapa 12 — 13/10/2026
+
+- A autorização posterior do usuário permitiu acessar o frontend local existente na porta 3001 e criar registros “Validação Chrono”. Exclusão de duas atividades, arquivamento do modelo, restauração da ocorrência e encerramento da série receberam confirmação específica. As atividades anteriores foram preservadas; nenhuma credencial foi registrada em arquivos.
+- Confirmados login/logout, validação de senha vazia, criação/detalhe/edição/conclusão/exclusão de atividade e recusa de horários inválidos. Ausência de sessão durante envio, provocada por logout em outra aba, preservou o rascunho e focou o alerta; login restabeleceu a sessão. O rascunho não virou atividade.
+- Confirmados criação diária com três ocorrências, personalização, conclusão, herança, reinício dos modos após salvar, restauração e reagendamento mantendo a data original no endereço. Edição em série criou novo trecho, preservou o conteúdo da concluída e atualizou as futuras. Encerramento em 15/10 limitou o trecho a 14/10; resposta de conflito preservou os dados e mostrou o link da ocorrência bloqueadora.
+- Confirmados criação/edição de modelo, foco e valores preservados ao remover item, aplicação/reaplicação sem duplicação e arquivamento com cópia preservada. A cópia foi excluída depois da conferência. Modelo vazio registrou aplicação sem atividades; adicionar item depois não alterou a reaplicação da mesma semana. Edição desatualizada entre abas foi recusada, preservando o draft e focando o alerta.
+- Inspeção visual em 1280 px e 320 px, com login, agenda, mês e editores sem transbordamento horizontal da página; semana com rolagem restrita à grade. Conferidos Tab no login e foco dos erros, da aplicação e da remoção de item. Console da aba sem erros/avisos no encerramento da validação. Overrides de viewport restaurados e abas auxiliares fechadas.
+- Não encontrados defeitos funcionais adicionais nos cenários exercitados. Esta continuação altera apenas README e plano; não cria testes, dependências ou mudanças no backend. As verificações de TypeScript, lint e build da entrega estática continuam sendo o último resultado para a implementação, que permaneceu inalterada.
+- Registros restantes: série “Validação Chrono — série editada”, trecho anterior e corte em 15/10, com a ocorrência original de 13/10 reagendada para 14/10; modelo “Validação Chrono — modelo vazio aplicado”, com um item e aplicação vazia na semana de 12/10. Não foram removidos esses registros além do autorizado.
+- Limitações: zoom 200%, leitor de tela, sobreposições reais, expiração natural do JWT, rede/timeout, respostas malformadas, gravações simultâneas, todas as combinações de repetição e reaplicação após remover/reagendar cópias não exercitados. A conferência de versão entre abas não comprova atomicidade. Matriz atualizada no README; os limites históricos anteriores permanecem como registro de cada entrega.
 
 ## Registro de continuidade
 
@@ -490,4 +501,4 @@ Preencher ao concluir cada etapa:
 
 Situações sugeridas: não iniciada, em implementação, aguardando revisão, aprovada.
 
-**Próxima ação:** revisar as correções da etapa 12 e concluir a validação autenticada/visual conforme a matriz no README quando houver acesso disponível. Não há nova etapa funcional prevista; os registros anteriores são históricos. A continuidade atual está na entrega 12, com revisão estática concluída e validação manual pendente.
+**Situação atual:** implementação das etapas previstas e revisão integrada principal concluídas no ambiente disponível. README registra a validação real e seus limites. Não há nova etapa funcional prevista; os registros anteriores são históricos. Verificações adicionais podem ser dirigidas aos cenários não exercitados, sem tratá-los como resultados já aprovados.

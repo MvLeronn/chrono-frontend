@@ -431,6 +431,17 @@ Não enviar IDs internos no payload dos itens. Explicar que editar um modelo nã
 - Verificações: `yarn typecheck`, `yarn lint`, `yarn build` e `git diff --check`. Nenhum teste automatizado, dependência nova ou mudança no backend.
 - Limites: edição autenticada, preservação de cópias existentes e inspeção visual (desktop/mobile, foco, teclado, zoom) não reproduzidos. A consulta anterior ao PATCH não oferece proteção atômica contra concorrência; o contrato não tem versionamento condicional. Próximo passo: revisão de 11B antes de autorizar 11C (aplicação semanal).
 
+### Entrega da etapa 11C — aguardando revisão
+
+- Implementada `/modelos/[id]/aplicar`, acessível pelo detalhe, com formulário no padrão visual existente. Semana inicial vem do fuso da conta; data deve ser segunda-feira e comportar domingo até o ano 9999. Semanas passadas são aceitas; a semana parcial final do ano 9999 é recusada.
+- Confirmação apresenta segunda-feira/domingo, quantidade atual de itens, preservação das atividades existentes, independência das cópias e efeito de reaplicar. Mudar a data exige confirmar novamente. Modelo vazio tem explicação explícita: registra aplicação sem atividades e não passa a preencher aquela semana ao receber itens depois.
+- Server Action verifica sessão, data, confirmação e modelo fresco; mudança de `updatedAt` exige nova revisão. POST envia somente `weekStart`. Valida 201/`alreadyApplied: false` e 200/`alreadyApplied: true`, identidade da aplicação, vínculo e estrutura de eventos, IDs únicos e status/conclusão. Na primeira aplicação, exige pendência e datas dentro da semana; na reaplicação aceita os eventos atuais reagendados para fora dela.
+- Resultado usa o retorno real da action, sem GET fictício nem aplicação ao carregar a página. Exibe primeira aplicação/reaplicação, eventos ordenados por data/horário/ID, datas atuais, status, detalhes e acesso ao calendário. Lista vazia na reaplicação não presume se o modelo era vazio ou se os eventos foram removidos.
+- Data e confirmação preservadas em falhas; recuperação de sessão/consulta em outra aba e orientação para repetir a mesma segunda-feira em resultado incerto, aproveitando a idempotência do backend. Sem retry automático. Sucesso invalida calendário e modelos; foco vai ao título do resultado.
+- Arquivos: `src/app/modelos/[id]/aplicar/{page.tsx,ApplyTemplateForm.tsx,actions.ts,state.ts}`, detalhe, `src/lib/template-apply.ts`, model e transporte/API, README e plano. Nenhuma aplicação real foi executada pela ferramenta, dependência ou teste automatizado criado, nem alteração de backend/arquivamento antecipada.
+- Verificações: `yarn typecheck`, `yarn lint`, `yarn build` e `git diff --check`. Revisão estática dos limites civis, payload, respostas 200/201 e distinção de datas atuais versus semana da aplicação.
+- Limites: primeira aplicação/reaplicação autenticadas, eventos alterados/removidos, modelo vazio e inspeção visual (desktop/mobile, foco, teclado, zoom) não reproduzidos. Consulta prévia não garante atomicidade contra edição concorrente do modelo. Próximo passo: revisão de 11C antes de autorizar 11D (arquivamento).
+
 ## Etapa 12 — revisão integrada e documentação
 
 **Entrega:** revisão final dos fluxos já implementados, sem expansão de escopo.
@@ -458,4 +469,4 @@ Preencher ao concluir cada etapa:
 
 Situações sugeridas: não iniciada, em implementação, aguardando revisão, aprovada.
 
-**Próxima ação:** revisar a etapa 11B implementada. A etapa 11C (aplicação semanal e reaplicação idempotente) depende de nova autorização. Os registros anteriores são históricos; a continuidade atual está na entrega 11B.
+**Próxima ação:** revisar a etapa 11C implementada. A etapa 11D (arquivamento com preservação das cópias) depende de nova autorização. Os registros anteriores são históricos; a continuidade atual está na entrega 11C.

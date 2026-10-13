@@ -34,6 +34,7 @@ export async function requestApi(request: ApiRequest): Promise<ApiResult<unknown
       : request.path === "recurring-split" ? `recurring-events/${encodeURIComponent(request.id)}/split`
       : request.path === "recurring-detail" ? `recurring-events/${encodeURIComponent(request.id)}`
       : request.path === "recurring-list" || request.path === "recurring-create" ? "recurring-events"
+      : request.path === "template-apply" ? `week-templates/${encodeURIComponent(request.id)}/apply`
       : request.path === "template-detail" || request.path === "template-update" ? `week-templates/${encodeURIComponent(request.id)}`
       : request.path === "template-list" || request.path === "template-create" ? "week-templates"
       : "id" in request ? `events/${encodeURIComponent(request.id)}` : request.path;

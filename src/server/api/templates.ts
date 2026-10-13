@@ -1,7 +1,10 @@
 import "server-only";
 import { isLocalTime } from "../../lib/event-input";
+import { templateWeekEnd } from "../../lib/template-apply";
+import { isCalendarItem } from "./calendar";
 import { invalidResponse, isRecord, requestApi } from "./request";
-import type { CreateTemplateInput, TemplateListResponse, TemplateResponse, UpdateTemplateInput } from "../../models/template";
+import type { ApplyTemplateResponse, CreateTemplateInput, TemplateListResponse, TemplateResponse, UpdateTemplateInput } from "../../models/template";
+import type { EventResponse } from "../../models/calendar";
 import type { ApiResult } from "./types";
 
 const uuid = (value: unknown): value is string => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
@@ -49,4 +52,19 @@ export async function updateTemplate(id: string, input: UpdateTemplateInput): Pr
   if (!result.ok) return result;
   if (result.status !== 200 || !isTemplate(result.data) || result.data.id !== id) return invalidResponse(result.status);
   return { ok: true, status: 200, data: result.data };
+}
+
+export async function applyTemplate(id: string, weekStart: string): Promise<ApiResult<ApplyTemplateResponse>> {
+  const weekEnd = templateWeekEnd(weekStart);
+  if (!weekEnd) return { ok: false, status: 400, code: "INVALID_WEEK_START", message: "Escolha uma segunda-feira cuja semana termine até 31/12/9999." };
+  const result = await requestApi({ path: "template-apply", id, input: { weekStart } });
+  if (!result.ok) return result;
+  const data = result.data;
+  if (!isRecord(data) || !uuid(data.id) || data.weekStart !== weekStart || !(result.status === 201 && data.alreadyApplied === false || result.status === 200 && data.alreadyApplied === true) || !Array.isArray(data.events)) return invalidResponse(result.status);
+  const events = data.events;
+  if (!events.every((event: unknown): event is EventResponse => isCalendarItem(event) && event.source === "EVENT" && event.templateApplicationId === data.id && (event.status === "COMPLETED") === (event.completedAt !== null))) return invalidResponse(result.status);
+  if (new Set(events.map((event) => event.id)).size !== events.length) return invalidResponse(result.status);
+  if (!data.alreadyApplied && events.some((event) => event.status !== "PENDING" || event.date < weekStart || event.date > weekEnd)) return invalidResponse(result.status);
+  events.sort((a, b) => a.date.localeCompare(b.date) || (a.startTime ?? "").localeCompare(b.startTime ?? "") || a.id.localeCompare(b.id));
+  return { ok: true, status: result.status, data: { id: data.id, weekStart, alreadyApplied: data.alreadyApplied, events } };
 }

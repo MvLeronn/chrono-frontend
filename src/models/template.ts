@@ -1,4 +1,4 @@
-import type { ActivityType } from "./calendar";
+import type { ActivityType, EventResponse } from "./calendar";
 
 export interface TemplateItemInput {
   weekday: number;
@@ -15,6 +15,17 @@ export interface CreateTemplateInput {
 }
 
 export type UpdateTemplateInput = Partial<CreateTemplateInput>;
+
+export interface ApplyTemplateInput {
+  weekStart: string;
+}
+
+export interface ApplyTemplateResponse {
+  id: string;
+  weekStart: string;
+  alreadyApplied: boolean;
+  events: EventResponse[];
+}
 
 export interface TemplateItemResponse extends TemplateItemInput {
   id: string;

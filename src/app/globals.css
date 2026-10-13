@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #f4f7fa;
+  --color-surface: #ffffff;
+  --color-primary: #155e75;
+  --color-primary-hover: #164e63;
+  --color-primary-soft: #e0f2fe;
+  --color-text-primary: #172b3a;
+  --color-text-secondary: #526575;
+  --color-border: #dce5ec;
+  --color-text-on-primary: #ffffff;
+  --color-focus-ring: #155e75;
+  --color-status-pending: #854d0e;
+  --color-status-pending-soft: #fef9c3;
+  --color-status-in-progress: #1d4ed8;
+  --color-status-in-progress-soft: #eff6ff;
+  --color-status-completed: #047857;
+  --color-status-completed-soft: #ecfdf5;
+  --color-status-canceled: #b91c1c;
+  --color-status-canceled-soft: #fef2f2;
+  --color-error: #b91c1c;
+  --color-error-soft: #fef2f2;
+  --color-danger: #b91c1c;
+  --color-danger-soft: #fef2f2;
+  --radius-control: 0.5rem;
+  --radius-surface: 0.75rem;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+@layer base {
+  body {
+    background: var(--color-background);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}

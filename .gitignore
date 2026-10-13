@@ -1,0 +1,42 @@
+# Dependências e estado local do Yarn
+node_modules/
+.yarn/*
+!.yarn/patches/
+!.yarn/plugins/
+!.yarn/releases/
+!.yarn/versions/
+.pnp.*
+
+# Build e arquivos gerados
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# Variáveis locais (preservar o exemplo)
+.env*
+!.env.example
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs, caches e temporários
+*.log
+.cache/
+.eslintcache
+.stylelintcache
+coverage/
+tmp/
+temp/
+.vercel/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+Desktop.ini

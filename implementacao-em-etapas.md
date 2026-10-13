@@ -376,6 +376,18 @@ Não recalcular a expansão de recorrências no frontend. Não inferir o último
 - Verificações: `yarn typecheck`, `yarn lint`, `yarn build` e `git diff --check` passaram. Lint inicialmente apontou link de nova tentativa, corrigido antes da execução final. Nenhum teste automatizado, dependência nova ou alteração no backend.
 - Limites: criação/listagem/detalhe autenticados, paginação com dados reais, falhas de API e revisão visual (desktop/mobile, teclado, foco, zoom) não foram reproduzidos. Próximo passo: revisão de 10A antes de autorizar 10B (esta e as próximas por split).
 
+### Entrega da etapa 10B — aguardando revisão
+
+- Implementada a edição desta ocorrência e das próximas, autorizada pelo pedido de iniciar a próxima etapa. Alterações de 10A já staged foram preservadas; nenhum comando de stage/commit/reset foi executado.
+- A tela da ocorrência oferece escolha explícita de escopo e abre `/recorrencias/[id]/dividir?from=...` com ID do segmento e data original. Página/action conferem sessão, hoje no fuso da conta e ocorrência real; não recalculam expansão nem presumem último segmento pela lista.
+- Editor reutiliza `RecurringForm` em modo de seleção de mudanças. Defaults vêm da regra fresca, sem copiar overrides resolvidos da ocorrência. Campos não selecionados são omitidos; referência e término explicitamente selecionados expressam intenção mesmo quando os valores aparentes coincidem. Conteúdo, horários e término preservam âncora; frequência/intervalo alterados usam `fromDate` quando `startDate` é omitido. Contagem restante fica a cargo do backend.
+- Confirmação apresenta alcance, referência resultante, campos alterados, preservação de concluídas/personalizações compatíveis e possibilidade de trecho vazio. Histórico anterior é preservado. Não há encerramento, reabertura ou remoção automática de estados.
+- Server Action envia DTO restrito, recusa submissão vazia e regra alterada desde a abertura. Trata histórico protegido, referência/término/horários inválidos, ocorrência ausente, continuação já existente e conflito com datas/status validados. Draft é mantido, erros recebem foco e resultado incerto orienta conferir antes de repetir. Sem retry de POST.
+- Sucesso valida 201, novo ID, `previousId`, `seriesId` e `effectiveFrom`; invalida calendário e rotas de recorrências/ocorrências, redirecionando ao detalhe do novo trecho. A identidade visual `calendarKey` continua sendo fornecida pela API.
+- Arquivos principais: `src/app/recorrencias/[id]/dividir/{page.tsx,actions.ts}`, `src/lib/recurring-split.ts`, formulário/state compartilhados, detalhe da regra/ocorrência, model/transport/API, README e plano.
+- Verificações: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check` passaram. Nenhum teste automatizado, dependência ou alteração de backend.
+- Limites: split autenticado, migração de estados, conflitos reais e inspeção visual de desktop/mobile, foco, teclado e zoom não reproduzidos. Consulta prévia não garante atomicidade contra concorrência; não há versionamento no contrato. Próximo passo: revisão de 10B antes de autorizar 10C.
+
 ## Etapa 11 — modelos semanais
 
 Executar uma subetapa por vez:
@@ -414,4 +426,4 @@ Preencher ao concluir cada etapa:
 
 Situações sugeridas: não iniciada, em implementação, aguardando revisão, aprovada.
 
-**Próxima ação:** revisar a etapa 10A implementada. A etapa 10B (edição desta ocorrência e das próximas por split) depende de nova autorização. Os registros de etapas anteriores acima são históricos; a continuidade atual está na entrega 10A.
+**Próxima ação:** revisar a etapa 10B implementada. A etapa 10C (encerramento de recorrência por data) depende de nova autorização. Os registros de etapas anteriores acima são históricos; a continuidade atual está na entrega 10B.

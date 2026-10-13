@@ -10,6 +10,7 @@ interface RecurringDetailProps {
   }>;
   searchParams: Promise<{
     created?: string;
+    split?: string;
   }>;
 }
 
@@ -27,6 +28,7 @@ export default async function RecurringDetail({ params, searchParams }: Recurrin
   const query = await searchParams;
   return <div className="mx-auto max-w-2xl space-y-6">
     {query.created === "1" && <p role="status" className="rounded-control bg-status-completed-soft p-3 text-status-completed">Recorrência criada.</p>}
+    {query.split === "1" && <p role="status" className="rounded-control bg-status-completed-soft p-3 text-status-completed">Alterações salvas. Este é o novo trecho da recorrência; as ocorrências anteriores foram preservadas.</p>}
     <header className="space-y-2"><p className="text-sm text-text-secondary">{item.type === "TASK" ? "Tarefa" : "Evento"} recorrente</p><h1 className="wrap-anywhere text-2xl font-semibold">{item.title}</h1><p className="font-semibold text-primary">{recurrenceLabel(item.frequency, item.interval)}</p></header>
     <dl className="space-y-5 rounded-surface border border-border bg-surface p-4 sm:p-6">
       <div><dt className="text-sm text-text-secondary">Data de referência da repetição</dt><dd className="mt-1">{formatDate(item.startDate)}</dd></div>
@@ -39,7 +41,7 @@ export default async function RecurringDetail({ params, searchParams }: Recurrin
       {item.frequency === "WEEKLY" && <p>Uma ocorrência por semana selecionada, sempre no mesmo dia da semana da referência: {formatCalendarDate(item.startDate, { weekday: "long" })}.</p>}
       {(item.frequency === "MONTHLY" || item.frequency === "YEARLY") && <p>Quando o dia não existe, usa-se o último dia válido do mês. A referência original é preservada para as repetições seguintes, inclusive em anos bissextos.</p>}
       {item.count !== null && <p>A contagem parte da data de referência, independentemente de cancelamentos e reagendamentos.</p>}
-      <p>Para alterar somente uma ocorrência, abra-a no calendário.</p>
+      <p>Para editar, abra uma ocorrência no calendário e escolha somente ela ou esta e as próximas.</p>
     </div>
     <div className="flex flex-wrap gap-4"><Link href="/recorrencias" className={link}>Voltar às recorrências</Link><Link href={dayHref(item.effectiveFrom)} className={link}>Ver data de início do trecho no calendário</Link>{item.previousId && <Link href={`/recorrencias/${item.previousId}`} prefetch={false} className={link}>Ver trecho anterior</Link>}</div>
   </div>;

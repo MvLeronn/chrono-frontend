@@ -30,6 +30,7 @@ export async function requestApi(request: ApiRequest): Promise<ApiResult<unknown
   try {
     const path = "occurrenceDate" in request
       ? `recurring-events/${encodeURIComponent(request.id)}/occurrences/${encodeURIComponent(request.occurrenceDate)}${request.path === "occurrence-reset" ? "/state" : ""}`
+      : request.path === "recurring-split" ? `recurring-events/${encodeURIComponent(request.id)}/split`
       : request.path === "recurring-detail" ? `recurring-events/${encodeURIComponent(request.id)}`
       : request.path === "recurring-list" || request.path === "recurring-create" ? "recurring-events"
       : "id" in request ? `events/${encodeURIComponent(request.id)}` : request.path;

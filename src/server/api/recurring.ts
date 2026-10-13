@@ -2,7 +2,7 @@ import "server-only";
 import { parseCalendarDate } from "../../lib/calendar-date";
 import { isLocalTime } from "../../lib/event-input";
 import { invalidResponse, isRecord, requestApi } from "./request";
-import type { CreateRecurringInput, RecurringEventListResponse, RecurringEventResponse } from "../../models/recurring";
+import type { CreateRecurringInput, RecurringEventListResponse, RecurringEventResponse, SplitRecurringInput } from "../../models/recurring";
 import type { ApiResult } from "./types";
 
 const uuid = (value: unknown): value is string => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
@@ -43,5 +43,12 @@ export async function createRecurring(input: CreateRecurringInput): Promise<ApiR
   const result = await requestApi({ path: "recurring-create", input });
   if (!result.ok) return result;
   if (result.status !== 201 || !isRecurring(result.data) || result.data.previousId !== null || result.data.effectiveFrom !== input.startDate || result.data.effectiveUntil !== null) return invalidResponse(result.status);
+  return { ok: true, status: 201, data: result.data };
+}
+
+export async function splitRecurring(id: string, seriesId: string, input: SplitRecurringInput): Promise<ApiResult<RecurringEventResponse>> {
+  const result = await requestApi({ path: "recurring-split", id, input });
+  if (!result.ok) return result;
+  if (result.status !== 201 || !isRecurring(result.data) || result.data.id === id || result.data.previousId !== id || result.data.seriesId !== seriesId || result.data.effectiveFrom !== input.fromDate) return invalidResponse(result.status);
   return { ok: true, status: 201, data: result.data };
 }

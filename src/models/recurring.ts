@@ -2,6 +2,11 @@ import type { ActivityType } from "./calendar";
 
 export type Frequency = "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
 
+export interface SplitRecurringInput {
+  fromDate: string;
+  changes: Partial<CreateRecurringInput>;
+}
+
 export interface CreateRecurringInput {
   title: string;
   type: ActivityType;

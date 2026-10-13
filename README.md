@@ -1,6 +1,6 @@
 # Chrono frontend
 
-Base em Next.js App Router, React e TypeScript estrito, com Tailwind CSS e Lucide. Login, consulta de sessão e logout local estão integrados. Agenda por período e visualizações mensal, semanal e diária usam leitura real no servidor. Eventos/tarefas concretos têm criação, detalhe, edição parcial, reagendamento, alteração de status e exclusão com confirmação (etapas 8A e 8B).
+Aplicação em Next.js App Router, React e TypeScript estrito, com Tailwind CSS e Lucide. Implementa autenticação, calendário em agenda/mês/semana/dia, eventos e tarefas, edição de ocorrências, criação/divisão/encerramento de recorrências e criação/edição/aplicação/arquivamento de modelos semanais. A revisão estática integrada foi realizada; os fluxos autenticados e a revisão visual final ainda precisam ser conferidos conforme a matriz abaixo.
 
 ## Ambiente e instalação
 
@@ -12,7 +12,7 @@ yarn install --immutable
 yarn dev
 ```
 
-Abra http://localhost:3001. Se a porta estiver ocupada, preserve o processo existente e use `yarn exec next dev --port 3002` (ou outra porta livre). A validação desta etapa usou a porta 3001.
+Abra http://localhost:3001. Se a porta estiver ocupada, preserve o processo existente e use `yarn exec next dev --port 3002` (ou outra porta livre). A revisão integrada não iniciou servidor nem realizou nova inspeção no navegador.
 
 O `.yarnrc.yml` define `checksumBehavior: throw`, `enableScripts: false`, `enableHardenedMode: true`, `npmMinimalAgeGate: 20160` (14 dias) e `nodeLinker: node-modules`. Preserve essas políticas e o `yarn.lock`; não é necessário habilitar scripts de dependências para executar a base.
 
@@ -94,7 +94,22 @@ O detalhe do modelo oferece arquivamento (etapa 11D) com confirmação explícit
 
 A action verifica sessão, confirmação e versão atual; mudanças desde a abertura exigem revisão. Falhas mantêm a confirmação, sem retry automático; 404 informa indisponibilidade ou arquivamento anterior sem alegar novo sucesso. Sucesso invalida lista/detalhe/edição/aplicação e retorna à lista com feedback. Nenhum endpoint de restauração ou listagem de arquivados foi inventado.
 
-Validação da etapa 11D: TypeScript, lint, build e conferência do diff registrados no plano. Nenhum teste automatizado novo. Arquivamento autenticado, preservação real de cópias e inspeção visual de desktop/mobile, teclado, foco e zoom permanecem pendentes. A leitura prévia não garante atomicidade contra edição concorrente. Próxima etapa: 12, revisão integrada e documentação, após revisão.
+## Revisão integrada — etapa 12
+
+Correções: a tela de erro geral atende todas as páginas e orienta conferir mutações com resultado incerto; falhas gerais de login recebem foco; a confirmação de exclusão de atividade permanece controlada em erros. O validador compartilhado rejeita atividades cujo status Concluído não corresponda à presença de `completedAt`. Após salvar/restaurar ocorrência, um identificador de revisão na URL reinicia o editor mesmo quando só a herança mudou e os valores resolvidos continuam iguais; esse identificador não é versão de concorrência nem campo enviado à API.
+
+| Verificação | Resultado e alcance |
+| --- | --- |
+| `yarn typecheck`, `yarn lint`, `yarn build` | Passaram após as correções; nenhuma suíte de testes criada. |
+| `git diff --check` | Passou; alterações limitadas às correções e documentação. |
+| Datas civis via inspeção pontual em Node | Conferidos ano 0001, virada 0099/0100, fevereiro bissexto/inválido, virada 2026/2027 e limite 9999. Semana parcial final não comporta aplicação de modelo. Sem arquivos de teste ou mocks na aplicação. |
+| Separação servidor/navegador | Referências a `API_BASE_URL`, cookie e Authorization restritas a `src/server`; nenhuma ocorrência de `API_BASE_URL`, `chrono_session`, `Bearer ` ou `Authorization` nos 23 arquivos JavaScript de `.next/static` inspecionados. Busca por marcadores não equivale a auditoria completa de segurança. |
+| Atualização após mutações e falhas | Revisão de código de invalidação, redirects, confirmação, campos controlados, bloqueio de envio simultâneo, erros e ausência de retry automático. Comportamento autenticado não reproduzido nesta revisão. |
+| Acessibilidade e responsividade | Labels, mensagens associadas, foco, status textual, movimento reduzido e rolagem local revisados no código. Não há modais customizados: confirmações usam `details` e formulários nativos, sem contrato de Escape de um diálogo. Teclado, leitor de tela, foco real, 320 px, zoom 200% e sobreposição de atividades ainda exigem inspeção no navegador. |
+
+Pendências de validação com API real: login/logout e expiração durante envio; criação/edição/exclusão de atividades; herança, reagendamento e restauração de ocorrências; split/encerramento e conflitos; edição/aplicação/reaplicação/arquivamento de modelos, incluindo modelo vazio e cópias alteradas/removidas. Também permanecem pendentes falhas reais de rede/timeout e concorrência entre abas. A leitura prévia das entidades não oferece proteção atômica contra alterações concorrentes, pois o contrato não fornece versão condicional.
+
+A restrição de acesso local registrada nas etapas anteriores foi preservada. Não foram criados registros reais, removidos dados, instaladas dependências ou iniciados servidores para esta revisão. Não foram encontrados catálogos ou dados demonstrativos temporários em `src` para remover. A etapa 12 fica aguardando revisão e validação manual; não há próxima funcionalidade prevista neste plano.
 
 O Yarn informa um peer transitivo ausente de `eslint` em `@next/eslint-plugin-next`, embora o projeto forneça ESLint. O lint deve ser validado antes de aceitar futuras atualizações. O aviso de scripts bloqueados de `unrs-resolver` é esperado pela política de instalação.
 

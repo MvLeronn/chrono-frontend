@@ -22,6 +22,7 @@ export function LoginForm({ notice }: LoginFormProps) {
   const [visible, setVisible] = useState(false);
   const [localError, setLocalError] = useState<string>();
   const passwordRef = useRef<HTMLInputElement>(null);
+  const alertRef = useRef<HTMLDivElement>(null);
   const submitted = useRef(false);
   const error = localError ?? state.passwordError;
 
@@ -29,6 +30,7 @@ export function LoginForm({ notice }: LoginFormProps) {
     if (!pending) {
       submitted.current = false;
       if (state.passwordError) passwordRef.current?.focus();
+      else if (state.message) alertRef.current?.focus();
     }
   }, [pending, state]);
 
@@ -85,7 +87,7 @@ export function LoginForm({ notice }: LoginFormProps) {
         </div>
         {error && <FieldError id="password-error" role="alert" className="mt-1">{error}</FieldError>}
       </div>
-      {state.message && <FieldError role="alert">{state.message}</FieldError>}
+      {state.message && <div ref={alertRef} role="alert" tabIndex={-1}><FieldError>{state.message}</FieldError></div>}
       <Button type="submit" loading={pending} loadingLabel="Entrando…" className="w-full">Entrar</Button>
       <p role="status" className="sr-only">{pending ? "Verificando acesso…" : ""}</p>
     </form>

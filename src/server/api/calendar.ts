@@ -14,6 +14,7 @@ export function isCalendarItem(value: unknown): value is CalendarItem {
   if (value.type !== "EVENT" && value.type !== "TASK") return false;
   if (typeof value.status !== "string" || !["PENDING", "IN_PROGRESS", "COMPLETED", "CANCELED"].includes(value.status)) return false;
   if (!(value.completedAt === null || isInstant(value.completedAt))) return false;
+  if ((value.status === "COMPLETED") !== (value.completedAt !== null)) return false;
   if (value.endTime !== null && (value.startTime === null || value.endTime <= value.startTime)) return false;
   if (value.source === "EVENT") return isUuid(value.id) && value.calendarKey === `event:${value.id}` && (value.templateApplicationId === null || isUuid(value.templateApplicationId)) && isInstant(value.createdAt) && isInstant(value.updatedAt);
   return value.source === "RECURRING" && (value.id === null || isUuid(value.id)) && isUuid(value.recurringEventId) && isUuid(value.seriesId) && isDate(value.occurrenceDate) && value.calendarKey === `recurring:${value.seriesId}:${value.occurrenceDate}`;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { Button } from "../../../components/ui/Button";
 import { dayHref } from "../../../lib/calendar-date";
 import { deleteEventAction } from "./actions";
@@ -16,6 +16,7 @@ interface DeleteEventFormProps {
 export function DeleteEventForm({ id, title, date, fromTemplate }: DeleteEventFormProps) {
   const [state, action, pending] = useActionState(deleteEventAction.bind(null, id), {} as EventFormState);
   const submitted = useRef(false);
+  const [confirmed, setConfirmed] = useState(false);
   const alert = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!pending) {
@@ -35,7 +36,7 @@ export function DeleteEventForm({ id, title, date, fromTemplate }: DeleteEventFo
       {state.message && <div ref={alert} role="alert" tabIndex={-1} className="space-y-2 rounded-control bg-error-soft p-3 text-sm text-error"><p>{state.message}</p>{(state.expired || state.uncertain) && <a href={state.expired ? "/login" : dayHref(date)} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold underline">{state.expired ? "Abrir login em outra aba" : "Conferir agenda em outra aba"}</a>}</div>}
       <fieldset disabled={pending} className="space-y-4">
         <legend className="sr-only">Confirmação de exclusão</legend>
-        <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm"><input type="checkbox" name="confirm" value="yes" required className="size-5 shrink-0 accent-primary" />Entendo que a exclusão é definitiva.</label>
+        <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm"><input type="checkbox" name="confirm" value="yes" required checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} className="size-5 shrink-0 accent-primary" />Entendo que a exclusão é definitiva.</label>
         <Button type="submit" variant="danger" loading={pending} loadingLabel="Excluindo…">Excluir definitivamente</Button>
       </fieldset>
       <p role="status" className="sr-only">{pending ? "Excluindo atividade…" : ""}</p>

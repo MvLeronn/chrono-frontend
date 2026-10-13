@@ -464,6 +464,17 @@ Não enviar IDs internos no payload dos itens. Explicar que editar um modelo nã
 - Atualizar README com instalação, ambiente, comandos, arquitetura e limitações reais.
 - Registrar operações não verificadas por indisponibilidade da API ou ausência de acesso.
 
+### Entrega da etapa 12 — revisão estática concluída; validação manual pendente
+
+- Revisados código de autenticação/transporte, contratos de atividades, invalidação após mutações, editores, confirmações, recuperação de falhas e componentes do calendário. Preservados tokens, tipografia, controles, limites de escopo e ausência de dependências/testes novos.
+- Corrigida a mensagem de erro raiz, antes exclusiva do calendário; adicionado foco às falhas gerais de login; confirmação de exclusão concreta agora controlada para permanecer em erros. Validador compartilhado confere a equivalência entre status Concluído e `completedAt` não nulo.
+- Ocorrências recebem identificador de revisão após salvar/restaurar, usado na chave do editor. Isso reinicia modos de personalização mesmo quando os valores resolvidos e os parâmetros anteriores de sucesso coincidem. Não é controle de versão do backend e não muda a identidade da ocorrência.
+- Arquivos alterados: `src/app/error.tsx`, `src/app/login/LoginForm.tsx`, `src/app/atividades/[id]/DeleteEventForm.tsx`, `src/app/ocorrencias/[id]/[date]/{actions.ts,page.tsx}`, `src/server/api/calendar.ts`, README e plano.
+- `yarn typecheck`, `yarn lint` e `yarn build` passaram após as correções. `git diff --check` passou. Inspeção pontual em Node conferiu datas civis nos limites 0001–9999, 0099/0100, fevereiro e virada de ano, sem criar testes. Inspeção de 23 arquivos JavaScript em `.next/static` não encontrou os marcadores privados `API_BASE_URL`, `chrono_session`, `Bearer ` ou `Authorization`; referências no código-fonte ficaram na camada `server-only`. Essa busca não substitui auditoria completa.
+- Acessibilidade/responsividade revisadas no código: controles nativos, labels, erros associados, foco visível, status textual, movimento reduzido, rolagem restrita às grades e preservação de campos. Confirmações usam expansão nativa, sem modais customizados ou necessidade de trap de foco/Escape. Não foram encontrados artefatos demonstrativos em `src` a remover.
+- README atualizado com escopo implementado, correções e matriz de validação. Mantidos instalação, configuração privada, comandos e limitações de concorrência. Nenhum dado real alterado, servidor iniciado ou backend modificado.
+- Pendências: fluxos autenticados de todos os módulos, falhas de rede/expiração, conflitos e concorrência; inspeção de desktop/mobile, 320 px, zoom 200%, teclado, foco real e leitor de tela. A restrição de acesso local registrada anteriormente foi preservada. Revisão estática não é aprovação visual nem confirmação de funcionamento ponta a ponta; a etapa aguarda revisão e validação manual.
+
 ## Registro de continuidade
 
 Preencher ao concluir cada etapa:
@@ -479,4 +490,4 @@ Preencher ao concluir cada etapa:
 
 Situações sugeridas: não iniciada, em implementação, aguardando revisão, aprovada.
 
-**Próxima ação:** revisar a etapa 11D implementada. A etapa 12 (revisão integrada e documentação) depende de nova autorização. Os registros anteriores são históricos; a continuidade atual está na entrega 11D.
+**Próxima ação:** revisar as correções da etapa 12 e concluir a validação autenticada/visual conforme a matriz no README quando houver acesso disponível. Não há nova etapa funcional prevista; os registros anteriores são históricos. A continuidade atual está na entrega 12, com revisão estática concluída e validação manual pendente.

@@ -53,5 +53,6 @@ export async function saveOccurrenceAction(id: string, date: string, initial: Oc
   const href = occurrenceHref(id, date);
   revalidatePath("/");
   revalidatePath(href);
-  redirect(`${href}?${intent === "reset" ? "restored" : "saved"}=1`);
+  // A successful save may only change inheritance, leaving resolved values identical.
+  redirect(`${href}?${intent === "reset" ? "restored" : "saved"}=1&revision=${crypto.randomUUID()}`);
 }

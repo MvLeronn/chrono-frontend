@@ -1,6 +1,6 @@
 # Chrono frontend
 
-Base em Next.js App Router, React e TypeScript estrito, com Tailwind CSS e Lucide. Login, consulta de sessão e logout local estão integrados. Agenda por período e visualizações mensal/diária usam leitura real no servidor, com estados de carregamento, vazio e falha. A etapa 7B adiciona a grade diária; criação e grade semanal permanecem nas etapas seguintes.
+Base em Next.js App Router, React e TypeScript estrito, com Tailwind CSS e Lucide. Login, consulta de sessão e logout local estão integrados. Agenda por período e visualizações mensal, semanal e diária usam leitura real no servidor, com estados de carregamento, vazio e falha. A etapa 7C adiciona a grade semanal; criação e edição permanecem nas etapas seguintes.
 
 ## Ambiente e instalação
 
@@ -40,11 +40,13 @@ A raiz e o login consultam `GET /auth/me` no servidor para conferir a sessão. U
 
 `src/server/api/calendar.ts` consulta `GET /calendar` com autenticação e `no-store`, valida a resposta e ordena por data, horário e `calendarKey`. A agenda exibe todos os status e distingue categoria de origem, inclusive cópias de modelos e ocorrências virtuais. Não há busca no mount, proxy público ou token nas props. A nova tentativa de falha preserva o período.
 
-O seletor Agenda/Mês/Dia preserva a agenda como padrão. O mês usa `/?view=month&date=YYYY-MM-DD`, semanas iniciadas na segunda-feira e consulta também os dias adjacentes visíveis. `CalendarDateToolbar.tsx` compartilha navegação entre mês e dia; `MonthView.tsx` exibe até três atividades por célula e a lista completa do dia selecionado abaixo da grade. No mobile, as células priorizam data e quantidade. `ActivityRow.tsx` compartilha a apresentação completa entre as visualizações.
+O seletor Agenda/Mês/Semana/Dia preserva a agenda como padrão. O mês usa `/?view=month&date=YYYY-MM-DD`, semanas iniciadas na segunda-feira e consulta também os dias adjacentes visíveis. `CalendarDateToolbar.tsx` compartilha navegação entre mês, semana e dia; `MonthView.tsx` exibe até três atividades por célula e a lista completa do dia selecionado abaixo da grade. No mobile, as células priorizam data e quantidade. `ActivityRow.tsx` compartilha a apresentação completa entre as visualizações.
 
 O dia usa `/?view=day&date=YYYY-MM-DD` e consulta apenas essa data. `DayView.tsx` separa atividades sem horário e posiciona as demais na grade de 24 horas. `src/lib/day-layout.ts` distribui sobreposições em colunas determinísticas; alturas mínimas são apenas visuais, sem inventar horário de fim. A grade permite rolagem local e oferece links para o conteúdo completo de cada atividade abaixo dela.
 
-Validação da etapa 7B: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check` passaram; sem testes automatizados novos. Inspeção pontual dos cálculos conferiu sobreposições, início sem fim, horário 23:59, fevereiro bissexto/não bissexto, viradas de ano e limites 0001–9999. A consulta autenticada e a interação visual não foram reproduzidas. A recusa anterior de acesso ao navegador local foi respeitada; desktop/mobile, teclado, foco, rolagem e zoom permanecem pendentes. O dia aguarda revisão antes da etapa 7C (semana).
+A semana usa `/?view=week&date=YYYY-MM-DD` e consulta uma vez o período de segunda a domingo. `WeekView.tsx` mantém dias alinhados, faixa sem horário e rolagem restrita à grade. Os blocos de horário são compartilhados com o dia em `TimedActivityBlocks.tsx`; sobreposições preservam largura de leitura. Links abrem o conteúdo completo, cada dia ou a semana inteira na agenda. A última semana do ano 9999 é limitada aos dias válidos.
+
+Validação da etapa 7C: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check` passaram; sem testes automatizados novos. Inspeção pontual dos cálculos conferiu segunda-feira como início, domingo, fevereiro bissexto, viradas de ano e limites 0001–9999. A consulta autenticada e a interação visual não foram reproduzidas. A recusa anterior de acesso ao navegador local foi respeitada; desktop/mobile, teclado, foco, rolagem e zoom permanecem pendentes. A semana aguarda revisão antes da etapa 8A (criar e consultar eventos/tarefas).
 
 O Yarn informa um peer transitivo ausente de `eslint` em `@next/eslint-plugin-next`, embora o projeto forneça ESLint. O lint deve ser validado antes de aceitar futuras atualizações. O aviso de scripts bloqueados de `unrs-resolver` é esperado pela política de instalação.
 

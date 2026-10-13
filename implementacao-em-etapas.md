@@ -279,6 +279,16 @@ Cada subetapa exige uma entrega e uma revisão próprias:
 
 **Validar em cada subetapa:** bordas de mês/ano, ano bissexto, limites 0001–9999, sobreposição quando aplicável e navegação por teclado. Não implementar drag-and-drop.
 
+#### Entrega da etapa 7C — aguardando revisão
+
+- Implementada visualização Semana em `/?view=week&date=YYYY-MM-DD`, mantendo Agenda como padrão. `weekRange` e `adjacentWeek` em `src/lib/calendar-date.ts` calculam segunda a domingo e navegação semanal dentro de 0001–9999. A última semana do ano 9999 exibe somente os cinco dias válidos, com aviso explícito.
+- `WeekView.tsx` consulta o período uma única vez no servidor. Dias compartilham linhas horárias alinhadas, faixa separada para atividades sem horário e cabeçalhos fixos durante rolagem. Hoje e dia selecionado têm indicação textual e visual. Vazio, falha, timeout, resposta inválida, nova tentativa e 401 seguem os padrões existentes.
+- A grade possui rolagem horizontal/vertical restrita a uma região focável; colunas de dias preservam largura mínima e se expandem para atividades simultâneas. `TimedActivityBlocks.tsx` compartilha os blocos com `DayView.tsx`, usando o cálculo de sobreposição existente, sem alterar horários nem inventar duração persistida.
+- Cada atividade abre seu conteúdo completo na lista abaixo da grade, com âncoras focáveis e retorno à grade. Links permitem abrir cada dia, o dia selecionado e a semana na agenda. Alternar de Semana para Agenda mantém exatamente o período exibido. `CalendarDateToolbar.tsx` agora atende mês, semana e dia.
+- Verificações concluídas: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check`. Inspeção pontual via Node confirmou semanas iniciadas na segunda-feira para 0001-01-01, 0099/0100, fevereiro bissexto de 2024, domingo 2026-10-18, virada 2026/2027 e limite 9999-12-31; navegação externa aos limites retornou nulo. Não foram criados testes automatizados, dependências, endpoints ou dados simulados na aplicação.
+- Limites: consulta autenticada, sobreposição com dados reais, cabeçalhos fixos, foco, teclado, rolagem, mobile e zoom não foram verificados no navegador. A recusa anterior de acesso local foi respeitada; comportamento visual foi revisado no código.
+- Próximo passo: revisão da semana pelo usuário; somente após autorização, etapa 8A (criar e consultar eventos/tarefas).
+
 ## Etapa 8 — eventos e tarefas concretos
 
 Dividir em duas entregas:

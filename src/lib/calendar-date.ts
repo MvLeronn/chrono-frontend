@@ -66,6 +66,23 @@ export function dayHref(date: string): string {
   return `/?view=day&date=${date}`;
 }
 
+export function weekHref(date: string): string {
+  return `/?view=week&date=${date}`;
+}
+
+export function weekRange(value: string): CalendarRange {
+  const date = parseCalendarDate(value);
+  if (!date) throw new Error("Invalid week date");
+  const offset = (date.getUTCDay() + 6) % 7;
+  const from = adjacentDate(value, -offset) ?? "0001-01-01";
+  return { from, to: adjacentDate(from, 6) ?? "9999-12-31" };
+}
+
+export function adjacentWeek(value: string, direction: -1 | 1): string | null {
+  const range = weekRange(value);
+  return direction === -1 ? adjacentDate(range.from, -7) : adjacentDate(range.to, 1);
+}
+
 export function adjacentMonth(value: string, direction: -1 | 1): string | null {
   const date = parseCalendarDate(value);
   if (!date) return null;

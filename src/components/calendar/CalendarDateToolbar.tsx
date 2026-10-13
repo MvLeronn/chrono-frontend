@@ -1,26 +1,30 @@
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { adjacentDate, adjacentMonth, dayHref, formatCalendarDate, monthHref } from "../../lib/calendar-date";
+import { adjacentDate, adjacentMonth, adjacentWeek, dayHref, formatCalendarDate, monthHref, weekHref, weekRange } from "../../lib/calendar-date";
 import { Button } from "../ui/Button";
 import { Label } from "../ui/Label";
 
 const linkClass = "inline-flex min-h-11 min-w-11 items-center justify-center rounded-control border border-text-secondary px-3 text-sm font-semibold hover:bg-background";
 
-export function CalendarDateToolbar({ date, today, view }: { date: string; today: string; view: "month" | "day" }) {
+export function CalendarDateToolbar({ date, today, view }: { date: string; today: string; view: "month" | "day" | "week" }) {
   const isMonth = view === "month";
-  const shift = isMonth ? adjacentMonth : adjacentDate;
-  const href = isMonth ? monthHref : dayHref;
+  const isWeek = view === "week";
+  const shift = isMonth ? adjacentMonth : isWeek ? adjacentWeek : adjacentDate;
+  const href = isMonth ? monthHref : isWeek ? weekHref : dayHref;
   const previous = shift(date, -1);
   const next = shift(date, 1);
+  const previousLabel = isMonth ? "Mês anterior" : isWeek ? "Semana anterior" : "Dia anterior";
+  const nextLabel = isMonth ? "Próximo mês" : isWeek ? "Próxima semana" : "Próximo dia";
+  const range = isWeek ? weekRange(date) : null;
   return (
     <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border p-4 sm:p-6">
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold capitalize">{formatCalendarDate(date, isMonth ? { month: "long", year: "numeric" } : { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</h2>
-        {!isMonth && date === today && <p className="text-sm font-semibold text-primary">Hoje</p>}
-        <div className="flex gap-2" role="group" aria-label={isMonth ? "Navegar entre meses" : "Navegar entre dias"}>
-          {previous ? <Link href={href(previous)} prefetch={false} aria-label={isMonth ? "Mês anterior" : "Dia anterior"} className={linkClass}><ChevronLeft aria-hidden="true" className="size-4" /></Link> : <button disabled aria-label={isMonth ? "Mês anterior" : "Dia anterior"} className="size-11 text-text-secondary"><ChevronLeft aria-hidden="true" className="mx-auto size-4" /></button>}
+        <h2 className="text-lg font-semibold capitalize">{range ? `${formatCalendarDate(range.from, { day: "numeric", month: "short", year: "numeric" })} a ${formatCalendarDate(range.to, { day: "numeric", month: "short", year: "numeric" })}` : formatCalendarDate(date, isMonth ? { month: "long", year: "numeric" } : { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</h2>
+        {!isMonth && !isWeek && date === today && <p className="text-sm font-semibold text-primary">Hoje</p>}
+        <div className="flex gap-2" role="group" aria-label={isMonth ? "Navegar entre meses" : isWeek ? "Navegar entre semanas" : "Navegar entre dias"}>
+          {previous ? <Link href={href(previous)} prefetch={false} aria-label={previousLabel} className={linkClass}><ChevronLeft aria-hidden="true" className="size-4" /></Link> : <button disabled aria-label={previousLabel} className="size-11 text-text-secondary"><ChevronLeft aria-hidden="true" className="mx-auto size-4" /></button>}
           <Link href={href(today)} prefetch={false} className={linkClass}>Hoje</Link>
-          {next ? <Link href={href(next)} prefetch={false} aria-label={isMonth ? "Próximo mês" : "Próximo dia"} className={linkClass}><ChevronRight aria-hidden="true" className="size-4" /></Link> : <button disabled aria-label={isMonth ? "Próximo mês" : "Próximo dia"} className="size-11 text-text-secondary"><ChevronRight aria-hidden="true" className="mx-auto size-4" /></button>}
+          {next ? <Link href={href(next)} prefetch={false} aria-label={nextLabel} className={linkClass}><ChevronRight aria-hidden="true" className="size-4" /></Link> : <button disabled aria-label={nextLabel} className="size-11 text-text-secondary"><ChevronRight aria-hidden="true" className="mx-auto size-4" /></button>}
         </div>
       </div>
       <form action="/" key={date} className="min-w-0 max-w-full space-y-2">

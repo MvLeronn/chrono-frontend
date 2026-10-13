@@ -11,7 +11,8 @@ import { CalendarToolbar } from "../components/calendar/CalendarToolbar";
 import { CalendarDateToolbar } from "../components/calendar/CalendarDateToolbar";
 import { DayView } from "../components/calendar/DayView";
 import { MonthView } from "../components/calendar/MonthView";
-import { calendarHref, dayHref, defaultRange, formatCalendarDate, isValidRange, monthHref, parseCalendarDate, todayInTimezone } from "../lib/calendar-date";
+import { WeekView } from "../components/calendar/WeekView";
+import { calendarHref, dayHref, defaultRange, formatCalendarDate, isValidRange, monthHref, parseCalendarDate, todayInTimezone, weekHref, weekRange } from "../lib/calendar-date";
 
 export default async function HomePage({ searchParams }: { searchParams: Promise<{ view?: string | string[]; date?: string | string[]; from?: string | string[]; to?: string | string[] }> }) {
   const session = await getCurrentUser();
@@ -29,7 +30,8 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
     const range = candidate && isValidRange(candidate) ? candidate : defaultRange(legacyDate);
     const isMonth = params.view === "month";
     const isDay = params.view === "day";
-    const isDateView = isMonth || isDay;
+    const isWeek = params.view === "week";
+    const isDateView = isMonth || isDay || isWeek;
     const invalidDate = params.date !== undefined && !(typeof params.date === "string" && parseCalendarDate(params.date));
     const viewLinkClass = "inline-flex min-h-11 items-center justify-center rounded-control px-4 text-sm font-semibold";
 
@@ -40,14 +42,15 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
           <p className="text-text-secondary">Seus eventos e tarefas.</p>
         </header>
         <nav aria-label="Visualização do calendário" className="mb-4 flex flex-wrap gap-2">
-          <Link href={calendarHref(isDateView ? defaultRange(legacyDate) : range)} prefetch={false} aria-current={!isDateView ? "page" : undefined} className={`${viewLinkClass} ${!isDateView ? "bg-primary text-text-on-primary" : "border border-text-secondary bg-surface hover:bg-background"}`}>Agenda</Link>
+          <Link href={calendarHref(isWeek ? weekRange(legacyDate) : isDateView ? defaultRange(legacyDate) : range)} prefetch={false} aria-current={!isDateView ? "page" : undefined} className={`${viewLinkClass} ${!isDateView ? "bg-primary text-text-on-primary" : "border border-text-secondary bg-surface hover:bg-background"}`}>Agenda</Link>
           <Link href={monthHref(isDateView ? legacyDate : range.from)} prefetch={false} aria-current={isMonth ? "page" : undefined} className={`${viewLinkClass} ${isMonth ? "bg-primary text-text-on-primary" : "border border-text-secondary bg-surface hover:bg-background"}`}>Mês</Link>
+          <Link href={weekHref(isDateView ? legacyDate : range.from)} prefetch={false} aria-current={isWeek ? "page" : undefined} className={`${viewLinkClass} ${isWeek ? "bg-primary text-text-on-primary" : "border border-text-secondary bg-surface hover:bg-background"}`}>Semana</Link>
           <Link href={dayHref(isDateView ? legacyDate : range.from)} prefetch={false} aria-current={isDay ? "page" : undefined} className={`${viewLinkClass} ${isDay ? "bg-primary text-text-on-primary" : "border border-text-secondary bg-surface hover:bg-background"}`}>Dia</Link>
         </nav>
         <section aria-labelledby="calendar-title" className="overflow-hidden rounded-surface border border-border bg-surface">
-          {isDateView ? <CalendarDateToolbar date={legacyDate} today={today} view={isMonth ? "month" : "day"} /> : <CalendarToolbar range={range} today={today} />}
+          {isDateView ? <CalendarDateToolbar date={legacyDate} today={today} view={isMonth ? "month" : isWeek ? "week" : "day"} /> : <CalendarToolbar range={range} today={today} />}
           {isDateView ? (
-            invalidDate ? <p role="alert" className="px-4 py-8 text-sm text-error sm:px-6">Data inválida. Escolha uma data entre 0001 e 9999 para consultar o calendário.</p> : <Suspense key={`${params.view}:${legacyDate}`} fallback={<AgendaLoading />}>{isMonth ? <MonthView date={legacyDate} today={today} /> : <DayView date={legacyDate} />}</Suspense>
+            invalidDate ? <p role="alert" className="px-4 py-8 text-sm text-error sm:px-6">Data inválida. Escolha uma data entre 0001 e 9999 para consultar o calendário.</p> : <Suspense key={`${params.view}:${legacyDate}`} fallback={<AgendaLoading />}>{isMonth ? <MonthView date={legacyDate} today={today} /> : isWeek ? <WeekView date={legacyDate} today={today} /> : <DayView date={legacyDate} />}</Suspense>
           ) : invalidRange ? (
             <p role="alert" className="px-4 py-8 text-sm text-error sm:px-6">Período inválido. Escolha datas entre 0001 e 9999, com o fim igual ou posterior ao início e no máximo 366 dias. Ajuste os campos acima para consultar a agenda.</p>
           ) : (

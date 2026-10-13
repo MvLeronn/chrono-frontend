@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { getCalendar } from "../../server/api/calendar";
 import { dayHref } from "../../lib/calendar-date";
 import { layoutDayActivities } from "../../lib/day-layout";
-import { ActivityRow, activityStatuses } from "./ActivityRow";
+import { TimedActivityBlocks } from "./TimedActivityBlocks";
+import { ActivityRow } from "./ActivityRow";
 
 export async function DayView({ date }: { date: string }) {
   const result = await getCalendar({ from: date, to: date });
@@ -40,15 +41,7 @@ export async function DayView({ date }: { date: string }) {
               {Array.from({ length: 25 }, (_, hour) => <div key={hour} className="absolute right-0 left-0 flex border-t border-border" style={{ top: hour * 120 }}><span className="sticky left-0 z-10 w-14 shrink-0 bg-surface px-2 py-1 text-xs tabular-nums text-text-secondary">{String(hour).padStart(2, "0")}:00</span></div>)}
             </div>
             <ol aria-label="Atividades posicionadas por horário" className="absolute top-0 right-2 bottom-0 left-14">
-              {positioned.map(({ item, start, visualEnd, column, columns: groupColumns }, index) => (
-                <li key={item.calendarKey} className="absolute px-1" style={{ top: start * 2, height: (visualEnd - start) * 2, left: `${column * 100 / groupColumns}%`, width: `${100 / groupColumns}%` }}>
-                  <a href={`#day-activity-${index}`} aria-label={`${item.title}. ${item.startTime}${item.endTime ? ` até ${item.endTime}` : ", sem horário de fim"}. ${activityStatuses[item.status].label}. Ver conteúdo completo.`} className={`block h-full overflow-hidden rounded-control border border-current p-2 text-xs ${activityStatuses[item.status].className}`}>
-                    <p className="font-semibold tabular-nums">{item.startTime}{item.endTime ? ` – ${item.endTime}` : " · Sem fim"}</p>
-                    <p className="mt-1 line-clamp-2 wrap-anywhere font-semibold">{item.title}</p>
-                    <p className="mt-1">{activityStatuses[item.status].label}</p>
-                  </a>
-                </li>
-              ))}
+              <TimedActivityBlocks activities={positioned} detailPrefix="day-activity" />
             </ol>
           </div>
         </div>

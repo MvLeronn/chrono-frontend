@@ -1,5 +1,6 @@
 import type { CreateEventInput, UpdateEventInput } from "../../models/event";
 import type { UpdateOccurrenceInput } from "../../models/occurrence";
+import type { CreateRecurringInput } from "../../models/recurring";
 
 export interface ApiFailure {
   ok: false;
@@ -47,4 +48,14 @@ export type ApiRequest = {
   id: string;
   occurrenceDate: string;
   input: UpdateOccurrenceInput;
+} | {
+  path: "recurring-list";
+  page: number;
+  limit: number;
+} | {
+  path: "recurring-create";
+  input: CreateRecurringInput;
+} | {
+  path: "recurring-detail";
+  id: string;
 };

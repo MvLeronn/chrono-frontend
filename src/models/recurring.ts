@@ -1,0 +1,35 @@
+import type { ActivityType } from "./calendar";
+
+export type Frequency = "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
+
+export interface CreateRecurringInput {
+  title: string;
+  type: ActivityType;
+  description: string | null;
+  startDate: string;
+  startTime: string | null;
+  endTime: string | null;
+  frequency: Frequency;
+  interval: number;
+  until: string | null;
+  count: number | null;
+}
+
+export interface RecurringEventResponse extends CreateRecurringInput {
+  id: string;
+  userId: string;
+  seriesId: string;
+  previousId: string | null;
+  effectiveFrom: string;
+  effectiveUntil: string | null;
+  invalidDatePolicy: "LAST_VALID_DAY";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RecurringEventListResponse {
+  items: RecurringEventResponse[];
+  total: number;
+  page: number;
+  limit: number;
+}

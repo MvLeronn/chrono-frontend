@@ -365,6 +365,17 @@ Executar uma subetapa por vez:
 
 Não recalcular a expansão de recorrências no frontend. Não inferir o último segmento a partir de uma página da lista. Não apagar estados automaticamente para resolver conflitos. Não inventar reabertura ou PATCH direto da regra.
 
+### Entrega da etapa 10A — aguardando revisão
+
+- Pedido de iniciar a próxima etapa autoriza criação, listagem paginada e detalhe das regras. Preservados tokens, fonte do sistema, controles e composição responsiva; nenhuma implementação de split ou encerramento.
+- `/recorrencias` consulta GET `/recurring-events` no servidor com `no-store`, `page` e `limit` validados (padrão 20). Lista inclui histórico, preserva ordem da API e esclarece que total conta regras/segmentos. Página inválida não consulta o serviço; página vazia além do total oferece retorno à primeira. Paginação preserva tamanho da página.
+- `/recorrencias/nova` oferece categoria, título, descrição, horários opcionais, âncora, frequência, intervalo e término exclusivo. Data padrão vem do fuso da conta; início passado é permitido. Explicações cobrem dia semanal único, ajuste mensal/anual para último dia válido, `until` inclusivo e contagem a partir da âncora. Não expande ocorrências no client.
+- Server Action verifica sessão, valida campos e envia somente DTO explícito. Formulário mantém preenchimento em erro, bloqueia envio simultâneo e oferece recuperação de sessão/resultado incerto sem retry. POST não é idempotente; a orientação é conferir a lista antes de repetir. Sucesso exige 201 válido, invalida calendário/lista e redireciona ao detalhe fresco.
+- `/recorrencias/[id]` exibe referência, término e limites efetivos separadamente, inclusive trecho vazio quando `effectiveUntil < effectiveFrom`. Link anterior usa somente `previousId` recebido. Não presume último trecho nem inventa navegação para continuação. `PrivateNavigation` identifica a seção atual e adiciona acesso às recorrências.
+- Arquivos: `src/app/recorrencias/{layout.tsx,page.tsx,nova/*,[id]/page.tsx}`, `src/models/recurring.ts`, `src/lib/recurring-input.ts`, `src/server/api/{recurring,request,types}.ts`, `src/components/{PrivateShell,PrivateNavigation}.tsx`, README e plano.
+- Verificações: `yarn typecheck`, `yarn lint`, `yarn build` e `git diff --check` passaram. Lint inicialmente apontou link de nova tentativa, corrigido antes da execução final. Nenhum teste automatizado, dependência nova ou alteração no backend.
+- Limites: criação/listagem/detalhe autenticados, paginação com dados reais, falhas de API e revisão visual (desktop/mobile, teclado, foco, zoom) não foram reproduzidos. Próximo passo: revisão de 10A antes de autorizar 10B (esta e as próximas por split).
+
 ## Etapa 11 — modelos semanais
 
 Executar uma subetapa por vez:
@@ -403,4 +414,4 @@ Preencher ao concluir cada etapa:
 
 Situações sugeridas: não iniciada, em implementação, aguardando revisão, aprovada.
 
-**Próxima ação:** revisar a etapa 9 implementada. A etapa 10A (criação, listagem e detalhe de regras recorrentes) depende de nova autorização. Os registros de etapas anteriores acima são históricos; a continuidade atual está na entrega 9.
+**Próxima ação:** revisar a etapa 10A implementada. A etapa 10B (edição desta ocorrência e das próximas por split) depende de nova autorização. Os registros de etapas anteriores acima são históricos; a continuidade atual está na entrega 10A.

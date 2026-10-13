@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { CalendarDays, Clock3, LogOut } from "lucide-react";
+import { Clock3, LogOut } from "lucide-react";
+import { PrivateNavigation } from "./PrivateNavigation";
 import { logoutAction } from "../app/actions/session";
 import { Button } from "./ui/Button";
 import type { ReactNode } from "react";
@@ -18,11 +18,7 @@ export function PrivateShell({ children }: PrivateShellProps) {
           <span className="text-xl font-semibold tracking-tight">Chrono</span>
         </div>
         <div className="flex items-center justify-between gap-3 lg:flex-1 lg:flex-col lg:items-stretch lg:gap-8">
-          <nav aria-label="Navegação principal" className="min-w-0 lg:mt-4">
-            <Link href="/" prefetch={false} aria-current="page" className="flex min-h-11 items-center gap-2 rounded-control bg-primary-soft px-3 py-2 text-sm font-semibold text-primary hover:bg-background">
-              <CalendarDays aria-hidden="true" className="size-5 shrink-0" />Calendário
-            </Link>
-          </nav>
+          <PrivateNavigation />
           <form action={logoutAction}>
             <Button type="submit" variant="secondary" className="lg:w-full"><LogOut aria-hidden="true" className="size-4" />Sair</Button>
           </form>

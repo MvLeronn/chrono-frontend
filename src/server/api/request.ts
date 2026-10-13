@@ -30,11 +30,17 @@ export async function requestApi(request: ApiRequest): Promise<ApiResult<unknown
   try {
     const path = "occurrenceDate" in request
       ? `recurring-events/${encodeURIComponent(request.id)}/occurrences/${encodeURIComponent(request.occurrenceDate)}${request.path === "occurrence-reset" ? "/state" : ""}`
+      : request.path === "recurring-detail" ? `recurring-events/${encodeURIComponent(request.id)}`
+      : request.path === "recurring-list" || request.path === "recurring-create" ? "recurring-events"
       : "id" in request ? `events/${encodeURIComponent(request.id)}` : request.path;
     const url = new URL(path, base);
     if (request.path === "calendar") {
       url.searchParams.set("from", request.from);
       url.searchParams.set("to", request.to);
+    }
+    if (request.path === "recurring-list") {
+      url.searchParams.set("page", String(request.page));
+      url.searchParams.set("limit", String(request.limit));
     }
     const response = await fetch(url, {
       method: request.path === "event-update" || request.path === "occurrence-update" ? "PATCH" : request.path === "event-delete" || request.path === "occurrence-reset" ? "DELETE" : body ? "POST" : "GET",

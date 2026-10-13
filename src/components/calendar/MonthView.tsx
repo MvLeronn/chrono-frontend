@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCalendar } from "../../server/api/calendar";
-import { calendarHref, formatCalendarDate, monthGrid, monthHref } from "../../lib/calendar-date";
+import { calendarHref, dayHref, formatCalendarDate, monthGrid, monthHref } from "../../lib/calendar-date";
 import type { CalendarItem } from "../../lib/calendar-types";
 import { ActivityRow, activityStatuses } from "./ActivityRow";
 
@@ -72,7 +72,10 @@ export async function MonthView({ date, today }: { date: string; today: string }
             <p className="mb-1 text-xs font-semibold text-primary">Dia selecionado{date === today ? " · Hoje" : ""}</p>
             <h2 id="selected-day-title" className="font-semibold"><time dateTime={date}>{formatCalendarDate(date, { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</time></h2>
           </div>
-          <Link href={calendarHref({ from: date, to: date })} prefetch={false} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">Abrir na agenda</Link>
+          <div className="flex flex-wrap gap-4">
+            <Link href={dayHref(date)} prefetch={false} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">Ver grade do dia</Link>
+            <Link href={calendarHref({ from: date, to: date })} prefetch={false} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">Abrir na agenda</Link>
+          </div>
         </div>
         {selectedItems.length ? <ul className="mt-3">{selectedItems.map((item) => <ActivityRow key={item.calendarKey} item={item} />)}</ul> : <p className="py-6 text-sm text-text-secondary">Nenhuma atividade neste dia. Selecione outra data para continuar.</p>}
       </section>

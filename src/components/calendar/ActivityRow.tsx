@@ -7,11 +7,11 @@ export const activityStatuses: Record<ActivityStatus, { label: string; className
   CANCELED: { label: "Cancelado", className: "bg-status-canceled-soft text-status-canceled" },
 };
 
-export function ActivityRow({ item }: { item: CalendarItem }) {
+export function ActivityRow({ item, id }: { item: CalendarItem; id?: string }) {
   const status = activityStatuses[item.status];
   const origin = item.source === "RECURRING" ? "Recorrência" : item.templateApplicationId ? "Modelo semanal" : "Atividade avulsa";
   return (
-    <li className="grid min-w-0 gap-2 border-b border-border py-4 last:border-b-0 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-4">
+    <li id={id} tabIndex={id ? -1 : undefined} className="grid min-w-0 scroll-mt-4 gap-2 border-b border-border py-4 last:border-b-0 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-4">
       <p className="text-sm font-semibold tabular-nums">
         {item.startTime ? <><time>{item.startTime}</time>{item.endTime ? <> – <time>{item.endTime}</time></> : <span className="mt-1 block text-xs font-normal text-text-secondary">Sem horário de fim</span>}</> : "Sem horário"}
       </p>

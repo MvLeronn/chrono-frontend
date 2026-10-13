@@ -260,6 +260,17 @@ Cada subetapa exige uma entrega e uma revisão próprias:
 - Posicionar atividades simultâneas sem escondê-las.
 - Aceitar início sem fim, sem inventar duração persistida.
 
+#### Entrega da etapa 7B — aguardando revisão
+
+- Adicionada visualização Dia em `/?view=day&date=YYYY-MM-DD`, preservando Agenda como padrão e a data ao alternar visualizações. O detalhe mensal também oferece acesso à grade do dia. Nenhuma implementação de semana, criação, edição ou drag-and-drop.
+- `CalendarDateToolbar.tsx` substitui `MonthToolbar.tsx` para compartilhar formulário e navegação entre mês/dia. Usa limites civis 0001–9999 e hoje calculado no servidor no fuso da conta. Datas inválidas não geram consulta de calendário.
+- `DayView.tsx` consulta somente a data selecionada via `GET /calendar`, no servidor. Separa atividades sem horário e exibe grade de 24 horas, com rolagem restrita à região quando necessário. Vazio, erro, timeout, resposta inválida, nova tentativa e 401 seguem os padrões existentes.
+- `src/lib/day-layout.ts` calcula grupos de sobreposição e distribui atividades em colunas, com ordem por início e desempate por `calendarKey`. A altura mínima é exclusivamente visual; não altera `endTime` nem infere duração persistida. O cálculo considera essa altura mínima para evitar colisões visuais, inclusive em atividades curtas e sem fim. Espaço após a última linha permite visualizar blocos iniciados às 23:59 sem recorte.
+- Blocos exibem horário, título e status textual; seus links nativos levam ao conteúdo completo, compartilhado com `ActivityRow.tsx`, em uma lista abaixo da grade. Há acesso direto à lista e retorno à grade, região de rolagem focável e âncoras focáveis nos detalhes. Colunas mantêm largura mínima em vez de ocultar atividades simultâneas no mobile. Sem dependências ou testes automatizados novos.
+- Verificações: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check` passaram. Inspeção pontual via Node conferiu início simultâneo, reutilização de coluna após término, altura mínima, início sem fim, separação de itens sem horário e atividade às 23:59; `endTime: null` permaneceu intacto. Conferidas também viradas de mês/ano, 0099/0100, fevereiro bissexto/não bissexto e bordas 0001–9999.
+- Limites: consulta autenticada, foco real, teclado, rolagem, desktop/mobile e zoom não foram verificados no navegador. A recusa anterior de acesso local foi respeitada. Cálculos foram inspecionados sem adicionar dados simulados à aplicação; sobreposição com dados reais ainda precisa de revisão visual.
+- Próximo passo: revisão da visualização diária; somente após autorização, etapa 7C (semana).
+
 ### 7C — semana
 
 - Reutilizar o padrão diário aprovado.

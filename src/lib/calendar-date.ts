@@ -62,6 +62,10 @@ export function monthHref(date: string): string {
   return `/?view=month&date=${date}`;
 }
 
+export function dayHref(date: string): string {
+  return `/?view=day&date=${date}`;
+}
+
 export function adjacentMonth(value: string, direction: -1 | 1): string | null {
   const date = parseCalendarDate(value);
   if (!date) return null;

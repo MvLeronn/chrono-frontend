@@ -11,6 +11,7 @@ interface RecurringDetailProps {
   searchParams: Promise<{
     created?: string;
     split?: string;
+    ended?: string;
   }>;
 }
 
@@ -28,6 +29,7 @@ export default async function RecurringDetail({ params, searchParams }: Recurrin
   const query = await searchParams;
   return <div className="mx-auto max-w-2xl space-y-6">
     {query.created === "1" && <p role="status" className="rounded-control bg-status-completed-soft p-3 text-status-completed">Recorrência criada.</p>}
+    {(query.ended === "1" || query.ended === "unchanged") && <p role="status" className="rounded-control bg-status-completed-soft p-3 text-status-completed">{query.ended === "unchanged" ? "O limite de encerramento existente foi mantido. A data escolhida não o antecipou." : "Encerramento salvo. Confira abaixo o limite atualizado deste trecho."}</p>}
     {query.split === "1" && <p role="status" className="rounded-control bg-status-completed-soft p-3 text-status-completed">Alterações salvas. Este é o novo trecho da recorrência; as ocorrências anteriores foram preservadas.</p>}
     <header className="space-y-2"><p className="text-sm text-text-secondary">{item.type === "TASK" ? "Tarefa" : "Evento"} recorrente</p><h1 className="wrap-anywhere text-2xl font-semibold">{item.title}</h1><p className="font-semibold text-primary">{recurrenceLabel(item.frequency, item.interval)}</p></header>
     <dl className="space-y-5 rounded-surface border border-border bg-surface p-4 sm:p-6">
@@ -44,5 +46,6 @@ export default async function RecurringDetail({ params, searchParams }: Recurrin
       <p>Para editar, abra uma ocorrência no calendário e escolha somente ela ou esta e as próximas.</p>
     </div>
     <div className="flex flex-wrap gap-4"><Link href="/recorrencias" className={link}>Voltar às recorrências</Link><Link href={dayHref(item.effectiveFrom)} className={link}>Ver data de início do trecho no calendário</Link>{item.previousId && <Link href={`/recorrencias/${item.previousId}`} prefetch={false} className={link}>Ver trecho anterior</Link>}</div>
+    <section className="space-y-2 border-t border-border pt-5"><h2 className="font-semibold">Encerramento</h2><p className="text-sm text-text-secondary">Defina uma data de corte, preservando as ocorrências anteriores. Se este trecho tiver uma continuação, o encerramento será recusado.</p><Link href={`/recorrencias/${id}/encerrar`} prefetch={false} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-error underline">Encerrar recorrência</Link></section>
   </div>;
 }

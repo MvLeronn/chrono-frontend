@@ -52,3 +52,10 @@ export async function splitRecurring(id: string, seriesId: string, input: SplitR
   if (result.status !== 201 || !isRecurring(result.data) || result.data.id === id || result.data.previousId !== id || result.data.seriesId !== seriesId || result.data.effectiveFrom !== input.fromDate) return invalidResponse(result.status);
   return { ok: true, status: 201, data: result.data };
 }
+
+export async function endRecurring(id: string, seriesId: string, fromDate: string): Promise<ApiResult<RecurringEventResponse>> {
+  const result = await requestApi({ path: "recurring-end", id, input: { fromDate } });
+  if (!result.ok) return result;
+  if (result.status !== 200 || !isRecurring(result.data) || result.data.id !== id || result.data.seriesId !== seriesId || result.data.effectiveUntil === null || result.data.effectiveUntil >= fromDate) return invalidResponse(result.status);
+  return { ok: true, status: 200, data: result.data };
+}

@@ -1,6 +1,6 @@
 import type { CreateEventInput, UpdateEventInput } from "../../models/event";
 import type { UpdateOccurrenceInput } from "../../models/occurrence";
-import type { CreateRecurringInput, SplitRecurringInput } from "../../models/recurring";
+import type { CreateRecurringInput, SplitRecurringInput, EndRecurringInput } from "../../models/recurring";
 
 export interface ApiFailure {
   ok: false;
@@ -62,4 +62,8 @@ export type ApiRequest = {
   path: "recurring-split";
   id: string;
   input: SplitRecurringInput;
+} | {
+  path: "recurring-end";
+  id: string;
+  input: EndRecurringInput;
 };

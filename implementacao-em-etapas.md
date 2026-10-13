@@ -388,6 +388,16 @@ Não recalcular a expansão de recorrências no frontend. Não inferir o último
 - Verificações: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check` passaram. Nenhum teste automatizado, dependência ou alteração de backend.
 - Limites: split autenticado, migração de estados, conflitos reais e inspeção visual de desktop/mobile, foco, teclado e zoom não reproduzidos. Consulta prévia não garante atomicidade contra concorrência; não há versionamento no contrato. Próximo passo: revisão de 10B antes de autorizar 10C.
 
+### Entrega da etapa 10C — aguardando revisão
+
+- Implementado encerramento por data exclusiva em `/recorrencias/[id]/encerrar`, acessível pelo detalhe da regra. Preservados tokens, controles e layout de formulário; confirmação por checkbox com explicação do histórico preservado, corte no início, limite existente e ausência de reabertura.
+- A página calcula a menor data com hoje no fuso da conta e início do trecho. A action revalida data, sessão e detalhe fresco; confere `updatedAt` contra a tela aberta antes da mutação. Não exige data de ocorrência nem presume último segmento pela lista. Backend valida ausência de continuação.
+- POST `/end` envia somente `fromDate`; resposta exige 200, mesmo ID/série e limite anterior ao corte. Sucesso invalida calendário, recorrências e ocorrências; detalhe distingue encerramento salvo de limite existente mantido. Sem retry automático.
+- Erros distinguem histórico protegido/data inválida, regra ausente, continuação existente, conflito e resultado incerto. Conflitos mostram datas/status validados e links em outra aba; nenhum estado é apagado. Formulário mantém preenchimento, bloqueia envio simultâneo, direciona foco ao erro e pede nova confirmação ao alterar data.
+- Arquivos: `src/app/recorrencias/[id]/encerrar/{page.tsx,EndRecurringForm.tsx,actions.ts,state.ts}`, detalhe da regra, `src/models/recurring.ts`, transporte/API, README e plano.
+- Verificações: `yarn typecheck`, `yarn lint`, `yarn build` e `git diff --check` passaram. Nenhum teste automatizado, dependência nova ou mudança no backend.
+- Limites: encerramento autenticado, repetição sem alteração, antecipação, conflitos reais e inspeção visual (desktop/mobile, teclado, foco, zoom) não reproduzidos. Consulta prévia não garante atomicidade contra alterações concorrentes. Próximo passo: revisão de 10C antes de autorizar 11A.
+
 ## Etapa 11 — modelos semanais
 
 Executar uma subetapa por vez:
@@ -426,4 +436,4 @@ Preencher ao concluir cada etapa:
 
 Situações sugeridas: não iniciada, em implementação, aguardando revisão, aprovada.
 
-**Próxima ação:** revisar a etapa 10B implementada. A etapa 10C (encerramento de recorrência por data) depende de nova autorização. Os registros de etapas anteriores acima são históricos; a continuidade atual está na entrega 10B.
+**Próxima ação:** revisar a etapa 10C implementada. A etapa 11A (listagem, criação e detalhe de modelos semanais) depende de nova autorização. Os registros anteriores são históricos; a continuidade atual está na entrega 10C.

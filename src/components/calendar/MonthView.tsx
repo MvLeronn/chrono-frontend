@@ -35,10 +35,9 @@ export async function MonthView({ date, today }: MonthViewProps) {
   const weeks = Array.from({ length: days.length / 7 }, (_, index) => days.slice(index * 7, index * 7 + 7));
   return (
     <>
-      <p className="px-4 py-3 text-xs text-text-secondary sm:px-6">Selecione um dia para ver todas as atividades abaixo. <span className="sm:hidden">Os números menores indicam a quantidade de atividades.</span></p>
       <table className="w-full table-fixed border-collapse text-left">
         <caption className="sr-only">{formatCalendarDate(date, { month: "long", year: "numeric" })}. Semanas começam na segunda-feira.</caption>
-        <thead><tr>{weekdays.map((day) => <th key={day} scope="col" className="border-y border-border py-3 text-center text-xs font-semibold text-text-secondary"><abbr title={day} className="no-underline">{day.slice(0, 3)}</abbr></th>)}</tr></thead>
+        <thead><tr>{weekdays.map((day) => <th key={day} scope="col" className="border-y border-border py-2 text-center text-xs font-semibold text-text-secondary"><abbr title={day} className="no-underline">{day.slice(0, 3)}</abbr></th>)}</tr></thead>
         <tbody>{weeks.map((week, index) => (
           <tr key={index}>
             {week.map((day, column) => {
@@ -51,20 +50,20 @@ export async function MonthView({ date, today }: MonthViewProps) {
               const href = `${monthHref(day)}#selected-day`;
               return (
                 <td key={day} className={`align-top border border-border ${selected ? "bg-primary-soft shadow-[inset_0_0_0_2px_var(--color-primary)]" : adjacent ? "bg-background" : "bg-surface"}`}>
-                  <div className="min-h-24 sm:min-h-48 sm:p-1">
+                  <div className="min-h-20 sm:h-28 sm:p-1">
                     <Link href={href} prefetch={false} aria-current={selected ? "date" : undefined} aria-label={`${fullDate}${isToday ? ", hoje" : ""}${selected ? ", selecionado" : ""}, ${items.length} atividades. Ver lista completa.`} className="flex min-h-11 items-center justify-center rounded-control sm:justify-start sm:px-1">
                       <span className={`flex size-8 items-center justify-center text-sm font-semibold tabular-nums ${isToday ? "rounded-full bg-primary text-text-on-primary" : adjacent ? "text-text-secondary" : "text-text-primary"}`}>{Number(day.slice(8))}</span>
                     </Link>
                     <p aria-hidden="true" className="pb-2 text-center text-xs tabular-nums text-text-secondary sm:hidden">{items.length > 0 ? items.length : "–"}</p>
                     <ul className="hidden space-y-1 sm:block">
-                      {items.slice(0, 3).map((item) => (
-                        <li key={item.calendarKey} className={`rounded-control px-2 py-1 text-xs ${activityStatuses[item.status].className}`}>
-                          <p className="line-clamp-2 wrap-anywhere font-semibold">{item.startTime && <span className="tabular-nums">{item.startTime} </span>}{item.title}</p>
-                          <p className="mt-1 text-[11px]">{activityStatuses[item.status].label}</p>
+                      {items.slice(0, 2).map((item) => (
+                        <li key={item.calendarKey} title={`${item.title} · ${activityStatuses[item.status].label}`} className={`rounded-control px-2 py-1 text-xs ${activityStatuses[item.status].className}`}>
+                          <p className="truncate font-semibold">{item.startTime && <span className="tabular-nums">{item.startTime} </span>}{item.title}</p>
+
                         </li>
                       ))}
                     </ul>
-                    {items.length > 3 && <Link href={href} prefetch={false} aria-label={`Ver todas as ${items.length} atividades de ${fullDate}`} className="hidden min-h-11 items-center rounded-control px-2 text-xs font-semibold text-primary underline underline-offset-2 sm:flex">+{items.length - 3} atividades</Link>}
+                    {items.length > 2 && <Link href={href} prefetch={false} aria-label={`Ver todas as ${items.length} atividades de ${fullDate}`} className="hidden min-h-6 items-center rounded-control px-2 text-xs font-semibold text-primary underline underline-offset-2 sm:flex">+{items.length - 2} atividades</Link>}
                   </div>
                 </td>
               );
@@ -72,7 +71,7 @@ export async function MonthView({ date, today }: MonthViewProps) {
           </tr>
         ))}</tbody>
       </table>
-      <section id="selected-day" tabIndex={-1} aria-labelledby="selected-day-title" className="scroll-mt-4 px-4 py-6 sm:px-6">
+      <section id="selected-day" tabIndex={-1} aria-labelledby="selected-day-title" className="scroll-mt-4 px-4 py-3 sm:px-6">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
             <p className="mb-1 text-xs font-semibold text-primary">Dia selecionado{date === today ? " · Hoje" : ""}</p>

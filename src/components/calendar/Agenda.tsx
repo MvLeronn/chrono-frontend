@@ -40,9 +40,9 @@ export async function Agenda({ range, today }: AgendaProps) {
       ) : (
         <div className="divide-y divide-border">
           {Array.from(groups, ([date, activities]) => (
-            <section key={date} aria-labelledby={`day-${date}`} className="px-4 py-5 sm:px-6">
+            <section key={date} aria-labelledby={`day-${date}`} className="px-4 py-3 sm:px-6">
               <div className="mb-2 flex items-center gap-3">
-                <span aria-hidden="true" className={`flex size-11 shrink-0 items-center justify-center text-lg font-semibold tabular-nums ${date === today ? "rounded-full bg-primary text-text-on-primary" : "rounded-control bg-background text-text-primary"}`}>{date.slice(8)}</span>
+                <span aria-hidden="true" className={`flex size-8 shrink-0 items-center justify-center text-lg font-semibold tabular-nums ${date === today ? "rounded-full bg-primary text-text-on-primary" : "rounded-control bg-background text-text-primary"}`}>{date.slice(8)}</span>
                 <h2 id={`day-${date}`} className="text-sm font-semibold"><time dateTime={date}>{formatCalendarDate(date, { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</time>{date === today && <span className="ml-2 text-primary">Hoje</span>}</h2>
               </div>
               <ul>{activities.map((item) => <ActivityRow key={item.calendarKey} item={item} />)}</ul>

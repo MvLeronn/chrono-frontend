@@ -12,7 +12,7 @@ export function PrivateShell({ children }: PrivateShellProps) {
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[14rem_minmax(0,1fr)]">
       <a href="#main-content" className="sr-only z-10 rounded-control bg-surface p-3 font-semibold text-primary focus:not-sr-only focus:absolute focus:left-4 focus:top-4">Pular para o conteúdo</a>
-      <aside className="flex flex-col gap-4 border-b border-border bg-surface p-4 sm:px-6 lg:border-r lg:border-b-0 lg:px-4 lg:py-8">
+      <aside className="flex flex-col gap-4 border-b border-border bg-surface p-4 sm:px-6 lg:sticky lg:top-0 lg:h-dvh lg:border-r lg:border-b-0 lg:px-4 lg:py-8">
         <div className="flex items-center gap-2 text-primary lg:px-3">
           <Clock3 aria-hidden="true" className="size-6" />
           <span className="text-xl font-semibold tracking-tight">Chrono</span>
@@ -24,8 +24,8 @@ export function PrivateShell({ children }: PrivateShellProps) {
           </form>
         </div>
       </aside>
-      <main id="main-content" tabIndex={-1} className="min-w-0 p-4 sm:p-6 lg:p-8">
-        <div className="mx-auto max-w-7xl">{children}</div>
+      <main id="main-content" tabIndex={-1} className="min-w-0 p-4 sm:p-5 lg:px-6 lg:py-4">
+        <div className="mx-auto max-w-[1600px]">{children}</div>
       </main>
     </div>
   );

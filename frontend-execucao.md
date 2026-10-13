@@ -418,11 +418,13 @@ O backend não retorna os overrides brutos. Portanto:
 - Para desfazer somente o reagendamento, enviar `scheduledDate` igual à data original. Não existe `scheduledDate: null`.
 - “Restaurar ocorrência” exclui todo o estado, inclusive conclusão/reagendamento, e deve informar esse efeito antes de chamar DELETE `/state`.
 
+Na edição de recorrência, os campos são editáveis diretamente; envie somente diferenças em relação à regra inicial. Explicações ficam no ícone de informações; os botões de salvar e encerrar substituem checkboxes de confirmação.
+
 Não salvar todos os valores resolvidos como overrides ao abrir/confirmar um formulário sem alterações: isso congela a herança e cria estados que podem bloquear operações futuras.
 
 ### Recorrências
 
-Criar e listar segmentos/regras com paginação, consultar detalhe, editar “esta e as próximas” por split e encerrar por data.
+Criar e listar segmentos/regras com paginação e filtro `status=active|history|all`, consultar detalhe, editar “esta e as próximas” por split e encerrar por data. As abas Atuais (padrão) e Histórico usam o filtro da API antes da paginação.
 
 - Formular campos de frequência, intervalo, início e término como sem fim/até data/quantidade, enviando combinações válidas.
 - Regras não possuem status de atividade; status é da ocorrência.

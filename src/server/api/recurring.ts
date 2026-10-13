@@ -2,7 +2,7 @@ import "server-only";
 import { parseCalendarDate } from "../../lib/calendar-date";
 import { isLocalTime } from "../../lib/event-input";
 import { invalidResponse, isRecord, requestApi } from "./request";
-import type { CreateRecurringInput, RecurringEventListResponse, RecurringEventResponse, SplitRecurringInput } from "../../models/recurring";
+import type { CreateRecurringInput, RecurringEventListResponse, RecurringEventDetailResponse, RecurringEventResponse, SplitRecurringInput, RecurringListStatus } from "../../models/recurring";
 import type { ApiResult } from "./types";
 
 const uuid = (value: unknown): value is string => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
@@ -22,21 +22,21 @@ function isRecurring(value: unknown): value is RecurringEventResponse {
   return value.invalidDatePolicy === "LAST_VALID_DAY" && instant(value.createdAt) && instant(value.updatedAt);
 }
 
-export async function listRecurring(page: number, limit: number): Promise<ApiResult<RecurringEventListResponse>> {
-  if (!integer(page, 1, 100000) || !integer(limit, 1, 100)) return { ok: false, status: 400, code: "INVALID_PAGINATION", message: "Paginação inválida." };
-  const result = await requestApi({ path: "recurring-list", page, limit });
+export async function listRecurring(page: number, limit: number, status: RecurringListStatus = "active"): Promise<ApiResult<RecurringEventListResponse>> {
+  if (!["active", "history", "all"].includes(status) || !integer(page, 1, 100000) || !integer(limit, 1, 100)) return { ok: false, status: 400, code: "INVALID_PAGINATION", message: "Paginação inválida." };
+  const result = await requestApi({ path: "recurring-list", page, limit, status });
   if (!result.ok) return result;
   const data = result.data;
   if (result.status !== 200 || !isRecord(data) || data.page !== page || data.limit !== limit || !integer(data.total, 0, Number.MAX_SAFE_INTEGER) || !Array.isArray(data.items) || data.items.length > limit || !data.items.every(isRecurring) || new Set(data.items.map((item) => item.id)).size !== data.items.length) return invalidResponse(result.status);
   return { ok: true, status: 200, data: { items: data.items, total: data.total, page, limit } };
 }
 
-export async function getRecurring(id: string): Promise<ApiResult<RecurringEventResponse>> {
+export async function getRecurring(id: string): Promise<ApiResult<RecurringEventDetailResponse>> {
   if (!uuid(id)) return { ok: false, status: 404, code: "NOT_FOUND", message: "Recorrência não encontrada." };
   const result = await requestApi({ path: "recurring-detail", id });
   if (!result.ok) return result;
-  if (result.status !== 200 || !isRecurring(result.data) || result.data.id !== id) return invalidResponse(result.status);
-  return { ok: true, status: 200, data: result.data };
+  if (result.status !== 200 || !isRecurring(result.data) || result.data.id !== id || !("isActive" in result.data) || typeof result.data.isActive !== "boolean") return invalidResponse(result.status);
+  return { ok: true, status: 200, data: result.data as RecurringEventDetailResponse };
 }
 
 export async function createRecurring(input: CreateRecurringInput): Promise<ApiResult<RecurringEventResponse>> {

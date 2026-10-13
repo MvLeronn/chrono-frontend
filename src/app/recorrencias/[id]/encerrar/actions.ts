@@ -21,19 +21,19 @@ function failure(result: ApiFailure, mutation = false): EndRecurringState {
         if (isRecord(row) && typeof row.occurrenceDate === "string" && parseCalendarDate(row.occurrenceDate) && (row.status === "PENDING" || row.status === "IN_PROGRESS" || row.status === "COMPLETED" || row.status === "CANCELED")) conflicts.push({ occurrenceDate: row.occurrenceDate, status: row.status });
       }
     }
-    return { message: "O encerramento não foi salvo. Há ocorrências com estado salvo a partir da data escolhida, inclusive possíveis pendentes sem personalização visível. Escolha outro corte ou revise essas ocorrências. Nenhum estado foi apagado.", conflicts };
+    return { message: "Existem ocorrências salvas a partir dessa data. Escolha uma data posterior ou revise os dados indicados.", conflicts };
   }
   return mutation ? { uncertain: true, message: "Não foi possível confirmar o encerramento. Confira o detalhe em outra aba antes de repetir: a alteração pode ter sido salva." } : { message: "Não foi possível consultar a recorrência. A data foi mantida; tente novamente em instantes." };
 }
 
-export async function endRecurringAction(id: string, version: string, _previous: EndRecurringState, formData: FormData): Promise<EndRecurringState> {
+export async function endRecurringAction(id: string, version: string, _previous: EndRecurringState, formData: FormData, returnToList = false): Promise<EndRecurringState> {
   const fromDate = formData.get("fromDate");
   if (typeof fromDate !== "string" || !parseCalendarDate(fromDate)) return { dateError: "Informe uma data válida entre 0001 e 9999." };
-  if (formData.get("confirm") !== "yes") return { message: "Confirme os efeitos do encerramento antes de continuar." };
   const session = await getCurrentUser();
   if (!session.ok) return failure(session);
   const current = await getRecurring(id);
   if (!current.ok) return failure(current);
+  if (!current.data.isActive) return { message: "Este trecho já está no histórico e não tem próximas repetições.", uncertain: true };
   if (fromDate < todayInTimezone(session.data.timezone) || fromDate < current.data.effectiveFrom) return { dateError: "A data deve ser hoje ou futura e não pode anteceder o início deste trecho." };
   if (current.data.updatedAt !== version) return { uncertain: true, message: "A regra mudou desde a abertura desta tela. Confira o detalhe atualizado em outra aba e reabra o encerramento antes de continuar." };
   const result = await endRecurring(id, current.data.seriesId, fromDate);
@@ -41,5 +41,7 @@ export async function endRecurringAction(id: string, version: string, _previous:
   revalidatePath("/");
   revalidatePath("/recorrencias", "layout");
   revalidatePath("/ocorrencias", "layout");
-  redirect(`/recorrencias/${id}?ended=${result.data.effectiveUntil === current.data.effectiveUntil ? "unchanged" : "1"}`);
+  const outcome = result.data.effectiveUntil === current.data.effectiveUntil ? "unchanged" : "1";
+  if (returnToList) redirect(`/recorrencias?ended=${outcome}`);
+  redirect(`/recorrencias/${id}?ended=${outcome}`);
 }

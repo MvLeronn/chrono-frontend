@@ -1,5 +1,7 @@
 import type { ActivityType } from "./calendar";
 
+export type RecurringListStatus = "active" | "history" | "all";
+
 export type Frequency = "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
 
 export interface EndRecurringInput {
@@ -34,6 +36,10 @@ export interface RecurringEventResponse extends CreateRecurringInput {
   invalidDatePolicy: "LAST_VALID_DAY";
   createdAt: string;
   updatedAt: string;
+}
+
+export interface RecurringEventDetailResponse extends RecurringEventResponse {
+  isActive: boolean;
 }
 
 export interface RecurringEventListResponse {

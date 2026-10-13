@@ -23,9 +23,9 @@ export function CalendarDateToolbar({ date, today, view }: CalendarDateToolbarPr
   const nextLabel = isMonth ? "Próximo mês" : isWeek ? "Próxima semana" : "Próximo dia";
   const range = isWeek ? weekRange(date) : null;
   return (
-    <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border p-4 sm:p-6">
-      <div className="space-y-3">
-        <h2 className="text-lg font-semibold capitalize">{range ? `${formatCalendarDate(range.from, { day: "numeric", month: "short", year: "numeric" })} a ${formatCalendarDate(range.to, { day: "numeric", month: "short", year: "numeric" })}` : formatCalendarDate(date, isMonth ? { month: "long", year: "numeric" } : { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</h2>
+    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <h2 className="text-base font-semibold">{range ? `${formatCalendarDate(range.from, { day: "numeric", month: "short", year: "numeric" })} a ${formatCalendarDate(range.to, { day: "numeric", month: "short", year: "numeric" })}` : formatCalendarDate(date, isMonth ? { month: "long", year: "numeric" } : { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</h2>
         {!isMonth && !isWeek && date === today && <p className="text-sm font-semibold text-primary">Hoje</p>}
         <div className="flex gap-2" role="group" aria-label={isMonth ? "Navegar entre meses" : isWeek ? "Navegar entre semanas" : "Navegar entre dias"}>
           {previous ? <Link href={href(previous)} prefetch={false} aria-label={previousLabel} className={linkClass}><ChevronLeft aria-hidden="true" className="size-4" /></Link> : <button disabled aria-label={previousLabel} className="size-11 text-text-secondary"><ChevronLeft aria-hidden="true" className="mx-auto size-4" /></button>}
@@ -33,9 +33,9 @@ export function CalendarDateToolbar({ date, today, view }: CalendarDateToolbarPr
           {next ? <Link href={href(next)} prefetch={false} aria-label={nextLabel} className={linkClass}><ChevronRight aria-hidden="true" className="size-4" /></Link> : <button disabled aria-label={nextLabel} className="size-11 text-text-secondary"><ChevronRight aria-hidden="true" className="mx-auto size-4" /></button>}
         </div>
       </div>
-      <form action="/" key={date} className="min-w-0 max-w-full space-y-2">
+      <form action="/" key={date} className="flex min-w-0 max-w-full flex-wrap items-center gap-2">
         <input type="hidden" name="view" value={view} />
-        <Label htmlFor="calendar-date">Ir para uma data</Label>
+        <Label className="sr-only" htmlFor="calendar-date">Ir para uma data</Label>
         <div className="flex flex-wrap gap-2">
           <input id="calendar-date" name="date" type="date" required min="0001-01-01" max="9999-12-31" defaultValue={date} className="min-h-11 min-w-0 max-w-full flex-1 rounded-control border border-text-secondary bg-surface px-3 py-2 text-base tabular-nums" />
           <Button type="submit" variant="secondary">Ir</Button>

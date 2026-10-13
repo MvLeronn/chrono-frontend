@@ -42,3 +42,8 @@
     outline-offset: 2px;
   }
 }
+
+/* Keep the calendar behind an open recurrence dialog stationary. */
+body:has(.recurring-modal[open]) {
+  overflow: hidden;
+}

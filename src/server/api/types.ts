@@ -1,7 +1,7 @@
 import type { CreateEventInput, UpdateEventInput } from "../../models/event";
 import type { ApplyTemplateInput, CreateTemplateInput, UpdateTemplateInput } from "../../models/template";
 import type { UpdateOccurrenceInput } from "../../models/occurrence";
-import type { CreateRecurringInput, SplitRecurringInput, EndRecurringInput } from "../../models/recurring";
+import type { CreateRecurringInput, SplitRecurringInput, EndRecurringInput, RecurringListStatus } from "../../models/recurring";
 
 export interface ApiFailure {
   ok: false;
@@ -53,6 +53,7 @@ export type ApiRequest = {
   path: "recurring-list";
   page: number;
   limit: number;
+  status: RecurringListStatus;
 } | {
   path: "recurring-create";
   input: CreateRecurringInput;

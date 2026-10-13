@@ -7,8 +7,8 @@ import { getRecurring, splitRecurring } from "../../../../server/api/recurring";
 import { getOccurrence } from "../../../../server/api/occurrences";
 import { isRecord } from "../../../../server/api/request";
 import { parseCalendarDate, todayInTimezone } from "../../../../lib/calendar-date";
-import { buildRecurringChanges, recurringDraft } from "../../../../lib/recurring-split";
-import type { RecurringDraft, RecurringFormState, RecurringSelection } from "../../nova/state";
+import { buildRecurringChanges, recurringDraft, recurringSelection } from "../../../../lib/recurring-split";
+import type { RecurringDraft, RecurringFormState } from "../../nova/state";
 import type { ApiFailure } from "../../../../server/api/types";
 
 function failure(result: ApiFailure, mutation = false): RecurringFormState {
@@ -24,29 +24,20 @@ function failure(result: ApiFailure, mutation = false): RecurringFormState {
   return mutation ? { uncertain: true, message: "Não foi possível confirmar a alteração. Confira as recorrências em outra aba antes de repetir: a continuação pode ter sido criada." } : { message: "Não foi possível consultar os dados atuais. Seu preenchimento foi mantido; tente novamente." };
 }
 
-export async function splitRecurringAction(id: string, fromDate: string, initial: RecurringDraft, _previous: RecurringFormState, formData: FormData): Promise<RecurringFormState> {
-  if (formData.get("confirm") !== "yes") return { message: "Confirme que deseja alterar esta ocorrência e as próximas." };
+export async function splitRecurringAction(id: string, fromDate: string, initial: RecurringDraft, _previous: RecurringFormState, formData: FormData, returnToList = false): Promise<RecurringFormState> {
   const session = await getCurrentUser();
   if (!session.ok) return failure(session);
   if (!parseCalendarDate(fromDate) || fromDate < todayInTimezone(session.data.timezone)) return { message: "Escolha uma ocorrência cuja data original seja hoje ou futura no fuso da conta." };
   const draft = { ...initial };
-  const selected: RecurringSelection = {};
   for (const key of Object.keys(initial) as (keyof RecurringDraft)[]) {
-    if (key === "until" || key === "count") continue;
-    if (formData.get(`change-${key}`) !== "yes") continue;
-    selected[key] = true;
     const value = formData.get(key);
-    if (typeof value !== "string") return { message: "Confira os campos selecionados." };
+    if (typeof value !== "string") return { message: "Confira os campos da recorrência." };
     draft[key] = value;
   }
-  if (selected.termination && (draft.termination === "until" || draft.termination === "count")) {
-    const value = formData.get(draft.termination);
-    if (typeof value !== "string") return { message: "Informe o término selecionado." };
-    draft[draft.termination] = value;
-  }
+  const selected = recurringSelection(initial, draft);
   const built = buildRecurringChanges(initial, draft, selected, fromDate);
   if (Object.keys(built.errors).length) return { errors: built.errors };
-  if (!Object.keys(built.changes).length) return { message: "Selecione e altere pelo menos um campo antes de salvar." };
+  if (!Object.keys(built.changes).length) return { message: "Altere pelo menos um campo para salvar." };
   const current = await getRecurring(id);
   if (!current.ok) return failure(current);
   // Avoid applying an old selection to a rule changed since the form was opened.
@@ -58,5 +49,6 @@ export async function splitRecurringAction(id: string, fromDate: string, initial
   revalidatePath("/");
   revalidatePath("/recorrencias", "layout");
   revalidatePath("/ocorrencias", "layout");
+  if (returnToList) redirect("/recorrencias?updated=1");
   redirect(`/recorrencias/${result.data.id}?split=1`);
 }

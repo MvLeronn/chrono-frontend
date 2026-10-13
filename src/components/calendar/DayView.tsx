@@ -9,9 +9,14 @@ import { ActivityRow } from "./ActivityRow";
 
 interface DayViewProps {
   date: string;
+  fullHours: boolean;
 }
 
-export async function DayView({ date }: DayViewProps) {
+export async function DayView({ date, fullHours }: DayViewProps) {
+  const startHour = fullHours ? 0 : 8;
+  const endHour = fullHours ? 24 : 22;
+  const hours = Array.from({ length: endHour - startHour }, (_, index) => startHour + index);
+  const gridHeight = (endHour - startHour) * 60;
   const result = await getCalendar({ from: date, to: date });
   if (!result.ok) {
     if (result.status === 401) redirect(result.code === "NO_SESSION" ? "/login" : "/login?reason=expired");
@@ -30,33 +35,31 @@ export async function DayView({ date }: DayViewProps) {
   return (
     <>
       {items.length === 0 && <p className="border-b border-border px-4 py-6 text-sm text-text-secondary sm:px-6">Nenhuma atividade neste dia. Use as setas ou escolha outra data para continuar.</p>}
-      <section aria-labelledby="untimed-title" className="border-b border-border px-4 py-5 sm:px-6">
+      {untimed.length > 0 && <section aria-labelledby="untimed-title" className="border-b border-border px-4 py-5 sm:px-6">
         <h2 id="untimed-title" className="font-semibold">Sem horário <span className="font-normal text-text-secondary">({untimed.length})</span></h2>
         {untimed.length ? <ul className="mt-2">{untimed.map((item) => <ActivityRow key={item.calendarKey} item={item} />)}</ul> : <p className="mt-2 text-sm text-text-secondary">Nenhuma atividade sem horário.</p>}
-      </section>
+      </section>}
       <section aria-labelledby="timeline-title">
-        <div className="space-y-2 px-4 py-5 sm:px-6">
+        <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2">
           <h2 id="timeline-title" tabIndex={-1} className="font-semibold">Com horário <span className="font-normal text-text-secondary">({positioned.length})</span></h2>
-          <p className="text-sm text-text-secondary">{positioned.length ? "Selecione uma atividade para ler o conteúdo completo abaixo." : "Nenhuma atividade com horário."}</p>
-          <p className="text-xs text-text-secondary">Selecione um espaço livre na grade para criar uma atividade naquele horário.</p>
-          {columns > 1 && <p id="timeline-scroll-help" className="text-xs text-text-secondary">Se necessário, role a grade horizontalmente para ver as atividades simultâneas.</p>}
           {positioned.length > 0 && <a href="#day-activities" className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">Ir para a lista de atividades com horário</a>}
         </div>
-        <div role="region" aria-label="Grade horária do dia" aria-describedby={columns > 1 ? "timeline-scroll-help" : undefined} tabIndex={0} className="max-h-[70dvh] overflow-auto border-y border-border">
-          <div className="relative" style={{ minWidth: 56 + columns * 176, height: (24 * 60 + 45) * 2 }}>
+        <div role="region" aria-label="Grade horária do dia" tabIndex={0} className="max-h-[calc(100dvh-19rem)] min-h-64 overflow-auto border-y border-border">
+          <div className="relative" style={{ minWidth: 56 + columns * 176, height: gridHeight }}>
             <div aria-hidden="true" className="absolute inset-0">
-              {Array.from({ length: 25 }, (_, hour) => <div key={hour} className="absolute right-0 left-0 flex border-t border-border" style={{ top: hour * 120 }}><span className="sticky left-0 z-10 w-14 shrink-0 bg-surface px-2 py-1 text-xs tabular-nums text-text-secondary">{String(hour).padStart(2, "0")}:00</span></div>)}
+              {[...hours, endHour].map((hour) => <div key={hour} className="absolute right-0 left-0 flex border-t border-border" style={{ top: (hour - startHour) * 60 }}><span className="sticky left-0 z-10 w-14 shrink-0 bg-surface px-2 py-1 text-xs tabular-nums text-text-secondary">{String(hour).padStart(2, "0")}:00</span></div>)}
             </div>
             <div className="absolute top-0 right-2 bottom-0 left-14">
-              {Array.from({ length: 24 }, (_, hour) => <Link key={hour} href={newEventHref(date, `${String(hour).padStart(2, "0")}:00`)} prefetch={false} aria-label={`Criar atividade às ${hour}:00`} className="absolute right-0 left-0 h-30 rounded-control text-xs text-text-secondary hover:bg-primary-soft focus-visible:bg-primary-soft" style={{ top: hour * 120 }}><span className="sr-only">Criar atividade às {hour}:00</span></Link>)}
+              {hours.map((hour) => <Link key={hour} href={newEventHref(date, `${String(hour).padStart(2, "0")}:00`)} prefetch={false} aria-label={`Criar atividade às ${hour}:00`} className="absolute right-0 left-0 h-15 rounded-control text-xs text-text-secondary hover:bg-primary-soft focus-visible:bg-primary-soft" style={{ top: (hour - startHour) * 60 }}><span className="sr-only">Criar atividade às {hour}:00</span></Link>)}
             </div>
             <ol aria-label="Atividades posicionadas por horário" className="pointer-events-none absolute top-0 right-2 bottom-0 left-14 [&_a]:pointer-events-auto">
-              <TimedActivityBlocks activities={positioned} detailPrefix="day-activity" />
+              <TimedActivityBlocks activities={positioned} detailPrefix="day-activity" startHour={startHour} endHour={endHour} />
             </ol>
           </div>
         </div>
       </section>
-      {positioned.length > 0 && <section id="day-activities" tabIndex={-1} aria-labelledby="day-activities-title" className="scroll-mt-4 px-4 py-6 sm:px-6"><h2 id="day-activities-title" className="font-semibold">Atividades com horário — conteúdo completo</h2><ul className="mt-2">{positioned.map(({ item }, index) => <ActivityRow key={item.calendarKey} id={`day-activity-${index}`} item={item} />)}</ul><a href="#timeline-title" className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">Voltar à grade horária</a></section>}
+      {!fullHours && <p className="px-4 py-2 text-xs text-text-secondary">Grade das 08h às 22h. A lista abaixo inclui todos os horários.</p>}
+      {positioned.length > 0 && <section id="day-activities" tabIndex={-1} aria-labelledby="day-activities-title" className="scroll-mt-4 px-4 py-6 sm:px-6"><h2 id="day-activities-title" className="font-semibold">Atividades com horário</h2><ul className="mt-2">{positioned.map(({ item }, index) => <ActivityRow key={item.calendarKey} id={`day-activity-${index}`} item={item} />)}</ul><a href="#timeline-title" className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">Voltar à grade horária</a></section>}
       <p className="border-t border-border px-4 py-3 text-xs text-text-secondary sm:px-6">Fuso do planejamento: <span className="break-all">{timezone}</span></p>
     </>
   );

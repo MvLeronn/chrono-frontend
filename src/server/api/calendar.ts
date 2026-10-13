@@ -8,7 +8,7 @@ const isDate = (value: unknown): value is string => typeof value === "string" &&
 const isTime = (value: unknown): value is string | null => value === null || (typeof value === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(value));
 const isInstant = (value: unknown): value is string => typeof value === "string" && /^\d{4}-\d{2}-\d{2}T/.test(value) && Number.isFinite(Date.parse(value));
 
-function isCalendarItem(value: unknown): value is CalendarItem {
+export function isCalendarItem(value: unknown): value is CalendarItem {
   if (!isRecord(value) || !isDate(value.date) || typeof value.title !== "string" || !value.title.trim() || value.title.length > 200 || !(value.description === null || typeof value.description === "string") || !isTime(value.startTime) || !isTime(value.endTime)) return false;
   if (value.type !== "EVENT" && value.type !== "TASK") return false;
   if (typeof value.status !== "string" || !["PENDING", "IN_PROGRESS", "COMPLETED", "CANCELED"].includes(value.status)) return false;

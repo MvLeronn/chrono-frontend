@@ -1,6 +1,7 @@
 import "server-only";
 import { getApiBaseUrl } from "../env";
 import { readSessionToken } from "../auth/session";
+import type { CreateEventInput } from "../../lib/event-input";
 
 export type ApiFailure = {
   ok: false;
@@ -24,7 +25,9 @@ export function invalidResponse(status: number): ApiFailure {
 type ApiRequest =
   | { path: "auth/login"; password: string }
   | { path: "auth/me" }
-  | { path: "calendar"; from: string; to: string };
+  | { path: "calendar"; from: string; to: string }
+  | { path: "events"; input: CreateEventInput }
+  | { path: "event-detail"; id: string };
 
 export async function requestApi(request: ApiRequest): Promise<ApiResult<unknown>> {
   const headers = new Headers({ Accept: "application/json" });
@@ -39,18 +42,19 @@ export async function requestApi(request: ApiRequest): Promise<ApiResult<unknown
   }
   const base = getApiBaseUrl();
   if (!base) return { ok: false, status: null, code: "CONFIGURATION_ERROR", message: "O serviço de acesso não está configurado. Tente novamente mais tarde." };
-  if (isLogin) headers.set("Content-Type", "application/json");
+  const body = isLogin ? { password: request.password } : request.path === "events" ? request.input : undefined;
+  if (body) headers.set("Content-Type", "application/json");
   const signal = AbortSignal.timeout(10_000);
   try {
-    const url = new URL(request.path, base);
+    const url = new URL(request.path === "event-detail" ? `events/${encodeURIComponent(request.id)}` : request.path, base);
     if (request.path === "calendar") {
       url.searchParams.set("from", request.from);
       url.searchParams.set("to", request.to);
     }
     const response = await fetch(url, {
-      method: isLogin ? "POST" : "GET",
+      method: body ? "POST" : "GET",
       headers,
-      body: isLogin ? JSON.stringify({ password: request.password }) : undefined,
+      body: body ? JSON.stringify(body) : undefined,
       cache: "no-store",
       redirect: "error",
       signal,

@@ -1,6 +1,6 @@
 # Chrono frontend
 
-Base em Next.js App Router, React e TypeScript estrito, com Tailwind CSS e Lucide. Login, consulta de sessão e logout local estão integrados. Agenda por período e visualizações mensal, semanal e diária usam leitura real no servidor, com estados de carregamento, vazio e falha. A etapa 7C adiciona a grade semanal; criação e edição permanecem nas etapas seguintes.
+Base em Next.js App Router, React e TypeScript estrito, com Tailwind CSS e Lucide. Login, consulta de sessão e logout local estão integrados. Agenda por período e visualizações mensal, semanal e diária usam leitura real no servidor. A etapa 8A adiciona criação de eventos/tarefas e consulta de detalhe atualizado; edição permanece na próxima etapa.
 
 ## Ambiente e instalação
 
@@ -46,7 +46,11 @@ O dia usa `/?view=day&date=YYYY-MM-DD` e consulta apenas essa data. `DayView.tsx
 
 A semana usa `/?view=week&date=YYYY-MM-DD` e consulta uma vez o período de segunda a domingo. `WeekView.tsx` mantém dias alinhados, faixa sem horário e rolagem restrita à grade. Os blocos de horário são compartilhados com o dia em `TimedActivityBlocks.tsx`; sobreposições preservam largura de leitura. Links abrem o conteúdo completo, cada dia ou a semana inteira na agenda. A última semana do ano 9999 é limitada aos dias válidos.
 
-Validação da etapa 7C: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check` passaram; sem testes automatizados novos. Inspeção pontual dos cálculos conferiu segunda-feira como início, domingo, fevereiro bissexto, viradas de ano e limites 0001–9999. A consulta autenticada e a interação visual não foram reproduzidas. A recusa anterior de acesso ao navegador local foi respeitada; desktop/mobile, teclado, foco, rolagem e zoom permanecem pendentes. A semana aguarda revisão antes da etapa 8A (criar e consultar eventos/tarefas).
+`/atividades/nova` oferece criação com data e início sugeridos pelo calendário. A Server Action verifica sessão e valida campos antes de chamar POST `/events`; o preenchimento permanece em erros e envios simultâneos são bloqueados na interface. Sucesso invalida o calendário e abre `/atividades/[id]`, que consulta GET `/events/:id` sem cache. Campos gerenciados pelo backend não são enviados. Ocorrências recorrentes continuam fora desse fluxo de criação/detalhe concreto.
+
+O backend não possui idempotência para criação: falhas de conexão ou respostas inesperadas podem deixar o resultado incerto. A interface orienta conferir a agenda em outra aba antes de reenviar; não repete o POST automaticamente. Sessão expirada durante envio mantém o formulário preenchido e oferece login em outra aba.
+
+Validação da etapa 8A: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check` passaram; sem testes automatizados novos. Criação/detalhe autenticados e comportamento visual não foram reproduzidos. A recusa anterior de acesso ao navegador local foi respeitada; desktop/mobile, teclado, foco e zoom permanecem pendentes. A criação aguarda revisão antes da etapa 8B (editar e remover).
 
 O Yarn informa um peer transitivo ausente de `eslint` em `@next/eslint-plugin-next`, embora o projeto forneça ESLint. O lint deve ser validado antes de aceitar futuras atualizações. O aviso de scripts bloqueados de `unrs-resolver` é esperado pela política de instalação.
 

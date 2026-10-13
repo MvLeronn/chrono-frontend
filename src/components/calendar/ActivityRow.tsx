@@ -1,4 +1,5 @@
 import type { ActivityStatus, CalendarItem } from "../../lib/calendar-types";
+import Link from "next/link";
 
 export const activityStatuses: Record<ActivityStatus, { label: string; className: string }> = {
   PENDING: { label: "Pendente", className: "bg-status-pending-soft text-status-pending" },
@@ -17,6 +18,7 @@ export function ActivityRow({ item, id }: { item: CalendarItem; id?: string }) {
       </p>
       <div className="min-w-0 space-y-2">
         <h3 className="wrap-anywhere font-semibold">{item.title}</h3>
+        {item.source === "EVENT" && <Link href={`/atividades/${item.id}`} prefetch={false} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">Ver detalhes</Link>}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-text-secondary">
           <span>{item.type === "TASK" ? "Tarefa" : "Evento"}</span>
           <span className={`rounded-control px-2 py-1 font-semibold ${status.className}`}>{status.label}</span>

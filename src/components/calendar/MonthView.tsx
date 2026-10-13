@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { newEventHref } from "../../lib/event-input";
 import { redirect } from "next/navigation";
 import { getCalendar } from "../../server/api/calendar";
 import { calendarHref, dayHref, formatCalendarDate, monthGrid, monthHref } from "../../lib/calendar-date";
@@ -73,6 +74,7 @@ export async function MonthView({ date, today }: { date: string; today: string }
             <h2 id="selected-day-title" className="font-semibold"><time dateTime={date}>{formatCalendarDate(date, { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</time></h2>
           </div>
           <div className="flex flex-wrap gap-4">
+            <Link href={newEventHref(date)} prefetch={false} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">Criar neste dia</Link>
             <Link href={dayHref(date)} prefetch={false} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">Ver grade do dia</Link>
             <Link href={calendarHref({ from: date, to: date })} prefetch={false} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">Abrir na agenda</Link>
           </div>

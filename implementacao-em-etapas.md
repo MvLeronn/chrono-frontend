@@ -300,6 +300,17 @@ Dividir em duas entregas:
 - Integrar criação real e detalhe atualizado por ID.
 - Impedir envio duplicado, preservar preenchimento em erro e atualizar a leitura em sucesso.
 
+#### Entrega da etapa 8A — aguardando revisão
+
+- Implementadas `/atividades/nova` e `/atividades/[id]`, protegidas pela sessão real. Formulário em uma coluna no mobile e duas para campos curtos no desktop, preservando tokens e controles existentes; título/descrição ocupam a largura completa. A apresentação do editor aguarda revisão do usuário antes da expansão para edição.
+- `EventForm.tsx` oferece título, categoria, data, horários opcionais, descrição e os quatro status. Campos controlados preservam o preenchimento em falhas; validação compartilhada em `src/lib/event-input.ts` cobre limites, data civil, horários e enumerações. Erros são associados aos campos e recebem foco. Bloqueio síncrono de submit e estado pendente impedem envio simultâneo pela interface.
+- Server Action em `atividades/nova/actions.ts` verifica sessão, valida o FormData em runtime e envia somente os campos contratados. `src/server/api/events.ts` integra POST `/events` e GET `/events/:id`, reutilizando validação estrutural de atividades. Transporte restrito a essas operações, sem proxy genérico, retry automático ou token no client.
+- Sucesso de criação exige 201 e resposta válida, invalida `/` e abre o detalhe por ID com nova consulta `no-store`. Detalhe mostra categoria, data, horários, status, descrição e origem, incluindo cópias de modelos; 404 e indisponibilidade possuem orientações próprias. Links em `ActivityRow` são exclusivos de eventos concretos; ocorrências não são enviadas ao endpoint de eventos.
+- Nova atividade parte da data selecionada. Mês oferece criação no dia selecionado; espaços livres das grades diária/semanal abrem o formulário com dia e início na hora escolhida, sem inventar fim. A página valida os defaults recebidos antes de exibi-los.
+- Sessão expirada durante envio preserva o draft e orienta login em outra aba. Falha de rede/servidor ou resposta de criação inesperada informa resultado incerto e oferece conferir a agenda antes de reenviar, pois o backend não fornece idempotência. Não há garantia de deduplicação entre abas ou submissões independentes.
+- Verificações: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check` passaram. Revisão estática dos contratos, payload permitido, defaults, preservação de campos e mutação sem retry. Nenhum teste automatizado, dependência, endpoint fictício ou alteração no backend.
+- Limites: criação/detalhe autenticados, erro real, campos em envio, foco, navegação de horários, desktop/mobile e zoom não foram reproduzidos no navegador. A recusa anterior de acesso local foi respeitada; não foram criados registros de teste ou mocks. Próximo passo: revisão da criação e consulta; depois, mediante autorização, etapa 8B (editar, reagendar, alterar status e excluir).
+
 ### 8B — editar e remover
 
 - Edição parcial, reagendamento e alteração entre os quatro status.

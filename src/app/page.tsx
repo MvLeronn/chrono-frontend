@@ -12,6 +12,7 @@ import { CalendarDateToolbar } from "../components/calendar/CalendarDateToolbar"
 import { DayView } from "../components/calendar/DayView";
 import { MonthView } from "../components/calendar/MonthView";
 import { WeekView } from "../components/calendar/WeekView";
+import { newEventHref } from "../lib/event-input";
 import { calendarHref, dayHref, defaultRange, formatCalendarDate, isValidRange, monthHref, parseCalendarDate, todayInTimezone, weekHref, weekRange } from "../lib/calendar-date";
 
 export default async function HomePage({ searchParams }: { searchParams: Promise<{ view?: string | string[]; date?: string | string[]; from?: string | string[]; to?: string | string[] }> }) {
@@ -40,6 +41,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         <header className="mb-6 space-y-1">
           <h1 id="calendar-title" className="text-2xl font-semibold leading-8">Calendário</h1>
           <p className="text-text-secondary">Seus eventos e tarefas.</p>
+          <Link href={newEventHref(isDateView ? legacyDate : range.from)} prefetch={false} className="mt-3 inline-flex min-h-11 items-center rounded-control bg-primary px-4 py-2 text-sm font-semibold text-text-on-primary hover:bg-primary-hover">Nova atividade</Link>
         </header>
         <nav aria-label="Visualização do calendário" className="mb-4 flex flex-wrap gap-2">
           <Link href={calendarHref(isWeek ? weekRange(legacyDate) : isDateView ? defaultRange(legacyDate) : range)} prefetch={false} aria-current={!isDateView ? "page" : undefined} className={`${viewLinkClass} ${!isDateView ? "bg-primary text-text-on-primary" : "border border-text-secondary bg-surface hover:bg-background"}`}>Agenda</Link>

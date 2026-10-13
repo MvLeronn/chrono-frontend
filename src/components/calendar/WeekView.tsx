@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { newEventHref } from "../../lib/event-input";
 import { redirect } from "next/navigation";
 import { getCalendar } from "../../server/api/calendar";
 import { adjacentDate, calendarHref, dayHref, formatCalendarDate, rangeLength, weekHref, weekRange } from "../../lib/calendar-date";
@@ -30,6 +31,7 @@ export async function WeekView({ date, today }: { date: string; today: string })
     <>
       <div className="space-y-2 px-4 py-4 sm:px-6">
         <p id="week-scroll-help" className="text-sm text-text-secondary">Role a grade horizontalmente para ver os dias. Selecione uma atividade para ler o conteúdo completo abaixo.</p>
+        <p className="text-xs text-text-secondary">Selecione um espaço livre na grade para criar uma atividade naquele dia e horário.</p>
         <div className="flex flex-wrap gap-x-4 gap-y-2">
           <Link href={dayHref(date)} prefetch={false} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">Abrir dia selecionado</Link>
           <Link href={calendarHref(range)} prefetch={false} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">Abrir semana na agenda</Link>
@@ -57,7 +59,8 @@ export async function WeekView({ date, today }: { date: string; today: string })
           </div>
           {days.map((day) => <div key={`timed-${day.date}`} className="relative border-l border-border" style={{ height: (24 * 60 + 45) * 2 }}>
             <div aria-hidden="true" className="absolute inset-0">{Array.from({ length: 25 }, (_, hour) => <div key={hour} className="absolute right-0 left-0 border-t border-border" style={{ top: hour * 120 }} />)}</div>
-            <ol aria-label={`Atividades com horário de ${formatCalendarDate(day.date, { day: "numeric", month: "long", year: "numeric" })}`} className="absolute inset-0"><TimedActivityBlocks activities={day.activities} detailPrefix={`week-${day.date}-timed`} /></ol>
+            {Array.from({ length: 24 }, (_, hour) => <Link key={hour} href={newEventHref(day.date, `${String(hour).padStart(2, "0")}:00`)} prefetch={false} aria-label={`Criar atividade em ${formatCalendarDate(day.date, { day: "numeric", month: "long" })} às ${hour}:00`} className="absolute right-0 left-0 h-30 rounded-control hover:bg-primary-soft focus-visible:bg-primary-soft" style={{ top: hour * 120 }}><span className="sr-only">Criar atividade às {hour}:00</span></Link>)}
+            <ol aria-label={`Atividades com horário de ${formatCalendarDate(day.date, { day: "numeric", month: "long", year: "numeric" })}`} className="pointer-events-none absolute inset-0 [&_a]:pointer-events-auto"><TimedActivityBlocks activities={day.activities} detailPrefix={`week-${day.date}-timed`} /></ol>
           </div>)}
         </div>
       </div>

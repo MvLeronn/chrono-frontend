@@ -1,6 +1,6 @@
 # Chrono frontend
 
-Base em Next.js App Router, React e TypeScript estrito, com Tailwind CSS e Lucide. A etapa 4 integra login e consulta de sessão à API Chrono, com logout local. A raiz mostra apenas a confirmação de acesso e a ação de sair; o calendário ainda não foi implementado.
+Base em Next.js App Router, React e TypeScript estrito, com Tailwind CSS e Lucide. Login, consulta de sessão e logout local estão integrados. A etapa 5 adiciona à raiz uma composição privada do calendário, com navegação responsiva e seleção de data. A prévia ainda não consulta atividades; criação e grades serão implementadas nas etapas seguintes.
 
 ## Ambiente e instalação
 
@@ -36,7 +36,9 @@ O formulário envia somente a senha para a Server Action, que chama `POST /auth/
 
 A raiz e o login consultam `GET /auth/me` no servidor para conferir a sessão. Um cookie presente não é prova de acesso. HTTP 401 retorna ao login sem loop; falhas de rede/serviço não são tratadas como senha incorreta. O transporte usa `no-store`, timeout de 10 segundos e não repete mutações automaticamente. Logout apaga o cookie por Server Action, sem endpoint fictício ou refresh token; não revoga cópias externas do JWT.
 
-Validação da etapa 4: build, lint e TypeScript passaram; senha vazia, senha incorreta real, redirecionamento sem sessão e rejeição de token inválido foram conferidos. O usuário confirmou login real bem-sucedido. Logout em sessão autenticada, expiração natural, timeout e respostas malformadas não foram reproduzidos; seus caminhos foram revisados no código. Zoom de 200% permanece pendente da etapa visual. Não há testes automatizados novos. A etapa 4 aguarda revisão antes da estrutura do calendário.
+`src/components/PrivateShell.tsx` organiza a área privada; `src/components/calendar` contém a toolbar e a prévia. A data fica em `/?date=YYYY-MM-DD`, com anterior/próximo/hoje e formulário nativo. Hoje é calculado no servidor no fuso da conta; datas inválidas exibem aviso e retornam a hoje. Nenhuma consulta a `GET /calendar` é feita nesta etapa.
+
+Validação da etapa 5: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check` passaram. A política do navegador bloqueou o acesso local por permissão recusada; a revisão visual em desktop/mobile, teclado e zoom de 200% permanece pendente. Não há testes automatizados novos. Na etapa 4, o usuário confirmou login real bem-sucedido; logout autenticado, expiração natural, timeout e respostas malformadas continuam sem reprodução manual. A composição da etapa 5 aguarda revisão antes da leitura real da agenda.
 
 O Yarn informa um peer transitivo ausente de `eslint` em `@next/eslint-plugin-next`, embora o projeto forneça ESLint. O lint deve ser validado antes de aceitar futuras atualizações. O aviso de scripts bloqueados de `unrs-resolver` é esperado pela política de instalação.
 

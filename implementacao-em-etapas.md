@@ -195,6 +195,17 @@ o, a desenvolver nas etapas do calendário. Evitar cartões decorativos e sombra
 
 **Ponto de revisão:** aprovar a organização da tela principal antes de desenvolver a grade.
 
+### Entrega da etapa 5 — aguardando revisão
+
+- Escopo autorizado pelo usuário: estrutura privada e composição visual; preservada a direção de cores, tipografia e controles já aprovada. Nenhuma aprovação visual desta nova composição foi presumida.
+- `src/components/PrivateShell.tsx` organiza navegação de 224 px no desktop, cabeçalho compacto no mobile, link para pular ao conteúdo e logout existente. Somente Calendário aparece na navegação; não há links para módulos futuros.
+- `src/components/calendar/{CalendarToolbar,CalendarPreview}.tsx` compõem título, seleção nativa de data, anterior/próximo/hoje, marcador da data e área sem atividades, explicitamente identificada como prévia. Nova atividade está desabilitado com indicação de disponibilidade futura, sem simular criação ou afirmar que a agenda real está vazia.
+- `src/app/page.tsx` mantém a verificação real da sessão antes de exibir a composição. Falhas de acesso preservam a tela de erro e nova tentativa. A URL é a fonte da data selecionada; o formulário funciona sem estado client duplicado.
+- `src/lib/calendar-date.ts` contém somente os helpers necessários à toolbar: data civil validada por round-trip, aritmética em UTC, limites 0001–9999 e hoje no fuso retornado pela API. Essa parte mínima de datas foi antecipada da etapa 6 para permitir seleção funcional, sem consultas de calendário.
+- Verificações: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check` passaram. Lint e typecheck precisaram de execução fora do sandbox porque o Corepack não conseguiu acessar o Yarn no ambiente restrito. Sem novas dependências, testes automatizados, endpoints ou alterações no backend.
+- Limites: inspeção no navegador bloqueada pela política de segurança, que informou permissão recusada para localhost:3001. Desktop, mobile, teclado, zoom de 200%, leitor de tela e logout autenticado não foram conferidos visualmente nesta etapa. Responsividade e foco foram revisados no código.
+- Próximo passo: revisão da composição pelo usuário; depois, mediante autorização, etapa 6 com leitura real da agenda por período. Grades e criação continuam nas etapas posteriores.
+
 ## Etapa 6 — leitura real em agenda
 
 **Entrega:** agenda por período, carregada no servidor com `GET /calendar`.

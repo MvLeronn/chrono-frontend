@@ -1,4 +1,4 @@
-import type { CreateEventInput } from "../../models/event";
+import type { CreateEventInput, UpdateEventInput } from "../../models/event";
 
 export interface ApiFailure {
   ok: false;
@@ -29,5 +29,12 @@ export type ApiRequest = {
   input: CreateEventInput;
 } | {
   path: "event-detail";
+  id: string;
+} | {
+  path: "event-update";
+  id: string;
+  input: UpdateEventInput;
+} | {
+  path: "event-delete";
   id: string;
 };

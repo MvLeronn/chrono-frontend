@@ -322,6 +322,16 @@ Dividir em duas entregas:
 
 **Ponto de revisão:** validar usabilidade do editor antes de reutilizá-lo para recorrências.
 
+#### Entrega da etapa 8B — aguardando revisão
+
+- Pedido de iniciar a próxima etapa autoriza a implementação de 8B a partir do editor existente. Preservados tokens, fonte local, controles e composição mobile/desktop; nenhuma expansão visual ou funcional para recorrências.
+- `/atividades/[id]/editar` carrega dados atuais e reutiliza `EventForm`. A action compara os campos com o snapshot exibido e envia somente diferenças por PATCH, validando o draft e sua combinação com uma leitura fresca. Limpar descrição/horários envia `null`; `completedAt` e vínculo de modelo nunca são enviados. Os quatro status, reagendamento e categoria são editáveis.
+- Detalhe oferece Editar atividade e confirmação de exclusão em expansão nativa, com checkbox obrigatório, título da atividade e explicações específicas: cancelamento mantém o registro; exclusão é definitiva; reaplicar o modelo na mesma semana não recria cópias removidas. DELETE 204 é tratado sem parsing de JSON.
+- Mutações verificam sessão e leitura atual, bloqueiam envio simultâneo na interface, preservam preenchimento em erro e distinguem 401, 404, validação e resultado incerto. Sucesso invalida calendário, detalhe e edição; redirects exibem confirmação. Sem retry de mutação.
+- Arquivos principais: `src/app/atividades/[id]/{actions.ts,DeleteEventForm.tsx,page.tsx,editar/page.tsx}`, editor em `nova/EventForm.tsx`, `src/server/api/{events,request,types}.ts`, `src/models/event.ts`, `src/lib/event-input.ts`, `Button.tsx`, página do calendário e README.
+- Verificações: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check` passaram. Revisão estática dos payloads e erros; nenhuma dependência nova, teste automatizado ou alteração de backend.
+- Limites: edição/exclusão autenticadas, desktop/mobile, foco, teclado e zoom não reproduzidos no navegador. O contrato não oferece controle de versão atômico; a leitura prévia não impede alterações concorrentes no mesmo campo após a consulta. Próximo passo: revisão de 8B antes de autorizar a etapa 9.
+
 ## Etapa 9 — ocorrência individual
 
 **Entrega:** edição de somente uma ocorrência, sem operações em série.
@@ -382,4 +392,4 @@ Preencher ao concluir cada etapa:
 
 Situações sugeridas: não iniciada, em implementação, aguardando revisão, aprovada.
 
-**Próxima ação:** aguardar a revisão da autenticação da etapa 4. Iniciar a etapa 5 somente após aprovação.
+**Próxima ação:** revisar a etapa 8B implementada. A etapa 9 (ocorrência individual) depende de nova autorização. Os registros de etapas anteriores acima são históricos; a continuidade atual está na entrega 8B.

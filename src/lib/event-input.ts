@@ -1,5 +1,10 @@
 import { parseCalendarDate } from "./calendar-date";
 import type { EventDraft, EventFormErrors } from "../app/atividades/nova/state";
+import type { EventResponse } from "../models/calendar";
+
+export function eventDraft(item: EventResponse): EventDraft {
+  return { title: item.title, type: item.type, date: item.date, startTime: item.startTime ?? "", endTime: item.endTime ?? "", description: item.description ?? "", status: item.status };
+}
 
 export const isLocalTime = (value: string) => /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 

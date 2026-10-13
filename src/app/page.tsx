@@ -21,6 +21,7 @@ interface HomePageProps {
     date?: string | string[];
     from?: string | string[];
     to?: string | string[];
+    deleted?: string;
   }>;
 }
 
@@ -47,6 +48,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
     return (
       <PrivateShell>
+        {params.deleted === "1" && <p role="status" className="mb-4 rounded-control bg-status-completed-soft p-3 text-status-completed">Atividade excluída.</p>}
         <header className="mb-6 space-y-1">
           <h1 id="calendar-title" className="text-2xl font-semibold leading-8">Calendário</h1>
           <p className="text-text-secondary">Seus eventos e tarefas.</p>

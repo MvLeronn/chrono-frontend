@@ -9,3 +9,5 @@ export interface CreateEventInput {
   description: string | null;
   status: ActivityStatus;
 }
+
+export type UpdateEventInput = Partial<CreateEventInput>;

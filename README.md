@@ -1,6 +1,6 @@
 # Chrono frontend
 
-Base em Next.js App Router, React e TypeScript estrito, com Tailwind CSS e Lucide. Login, consulta de sessão e logout local estão integrados. Agenda por período e visualizações mensal, semanal e diária usam leitura real no servidor. A etapa 8A adiciona criação de eventos/tarefas e consulta de detalhe atualizado; edição permanece na próxima etapa.
+Base em Next.js App Router, React e TypeScript estrito, com Tailwind CSS e Lucide. Login, consulta de sessão e logout local estão integrados. Agenda por período e visualizações mensal, semanal e diária usam leitura real no servidor. Eventos/tarefas concretos têm criação, detalhe, edição parcial, reagendamento, alteração de status e exclusão com confirmação (etapas 8A e 8B).
 
 ## Ambiente e instalação
 
@@ -54,7 +54,11 @@ A semana usa `/?view=week&date=YYYY-MM-DD` e consulta uma vez o período de segu
 
 O backend não possui idempotência para criação: falhas de conexão ou respostas inesperadas podem deixar o resultado incerto. A interface orienta conferir a agenda em outra aba antes de reenviar; não repete o POST automaticamente. Sessão expirada durante envio mantém o formulário preenchido e oferece login em outra aba.
 
-Validação da etapa 8A: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check` passaram; sem testes automatizados novos. Criação/detalhe autenticados e comportamento visual não foram reproduzidos. A recusa anterior de acesso ao navegador local foi respeitada; desktop/mobile, teclado, foco e zoom permanecem pendentes. A criação aguarda revisão antes da etapa 8B (editar e remover).
+`/atividades/[id]/editar` consulta os dados atuais e reutiliza o editor. PATCH envia somente diferenças em relação ao formulário aberto, incluindo `null` para limpar descrição/horários; valida também a combinação com a leitura atual antes de salvar. Os quatro status são livres, e `completedAt` permanece controlado pelo backend. Cópias de modelos são editadas individualmente. O contrato não oferece controle de versão atômico: alterações concorrentes no mesmo campo continuam sujeitas à última gravação.
+
+O detalhe oferece exclusão com confirmação explícita e explica a diferença para o status Cancelado. DELETE exige resposta 204 e não lê JSON. Excluir cópia de modelo preserva a aplicação; reaplicar a mesma semana não recria a cópia. Sucesso atualiza detalhe/calendário e mostra feedback; falhas preservam o editor e resultados incertos orientam conferir a agenda antes de repetir, sem retry automático.
+
+Validação da etapa 8B: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check` passaram; sem testes automatizados novos. Edição/exclusão autenticadas e comportamento visual não foram reproduzidos. Desktop/mobile, teclado, foco e zoom permanecem pendentes. A etapa 8B aguarda revisão; ocorrências individuais ficam para a etapa 9.
 
 O Yarn informa um peer transitivo ausente de `eslint` em `@next/eslint-plugin-next`, embora o projeto forneça ESLint. O lint deve ser validado antes de aceitar futuras atualizações. O aviso de scripts bloqueados de `unrs-resolver` é esperado pela política de instalação.
 

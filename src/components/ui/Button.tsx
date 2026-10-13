@@ -8,12 +8,13 @@ interface ButtonProps {
   className?: string;
   children: ReactNode;
   onClick?: MouseEventHandler<HTMLButtonElement>;
-  variant?: "primary" | "secondary";
+  variant?: "primary" | "secondary" | "danger";
   loading?: boolean;
   loadingLabel?: string;
 }
 
 const variants = {
+  danger: "border-error bg-error text-text-on-primary enabled:hover:bg-error/90",
   primary: "border-primary bg-primary text-text-on-primary enabled:hover:border-primary-hover enabled:hover:bg-primary-hover",
   secondary: "border-text-secondary bg-surface text-text-primary enabled:hover:bg-background",
 };

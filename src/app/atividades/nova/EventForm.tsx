@@ -13,14 +13,17 @@ import type { EventDraft, EventFormState } from "./state";
 interface EventFormProps {
   date: string;
   time: string;
+  initialDraft?: EventDraft;
+  saveAction?: (previous: EventFormState, formData: FormData) => Promise<EventFormState>;
+  cancelHref?: string;
 }
 
 const control = "min-h-11 w-full min-w-0 rounded-control border border-text-secondary bg-surface px-3 py-2 text-base aria-invalid:border-error";
 const labels: Record<keyof EventDraft, string> = { title: "Título", type: "Categoria", date: "Data", startTime: "Início (opcional)", endTime: "Fim (opcional)", description: "Descrição (opcional)", status: "Status" };
 
-export function EventForm({ date, time }: EventFormProps) {
-  const [draft, setDraft] = useState<EventDraft>({ title: "", type: "TASK", date, startTime: time, endTime: "", description: "", status: "PENDING" });
-  const [state, action, pending] = useActionState(createEventAction, {} as EventFormState);
+export function EventForm({ date, time, initialDraft, saveAction, cancelHref }: EventFormProps) {
+  const [draft, setDraft] = useState<EventDraft>(initialDraft ?? { title: "", type: "TASK", date, startTime: time, endTime: "", description: "", status: "PENDING" });
+  const [state, action, pending] = useActionState(saveAction ?? createEventAction, {} as EventFormState);
   const [localErrors, setLocalErrors] = useState<EventFormState["errors"]>();
   const form = useRef<HTMLFormElement>(null);
   const submitted = useRef(false);
@@ -62,7 +65,8 @@ export function EventForm({ date, time }: EventFormProps) {
         </div>)}
       </fieldset>
       <p className="text-sm text-text-secondary">Deixe os horários vazios para uma atividade sem horário. Você também pode informar apenas o início.</p>
-      <div className="flex flex-wrap items-center gap-4"><Button type="submit" loading={pending} loadingLabel="Criando…">Criar atividade</Button>{!pending && <Link href={dayHref(date)} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline">Cancelar</Link>}</div>
+      {initialDraft && <p className="text-sm text-text-secondary">O status Cancelado mantém a atividade no calendário. Para removê-la definitivamente, use Excluir no detalhe.</p>}
+      <div className="flex flex-wrap items-center gap-4"><Button type="submit" loading={pending} loadingLabel={initialDraft ? "Salvando…" : "Criando…"}>{initialDraft ? "Salvar alterações" : "Criar atividade"}</Button>{!pending && <Link href={cancelHref ?? dayHref(date)} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline">{initialDraft ? "Descartar alterações" : "Cancelar"}</Link>}</div>
       <p role="status" className="sr-only">{pending ? "Salvando atividade…" : ""}</p>
     </form>
   );

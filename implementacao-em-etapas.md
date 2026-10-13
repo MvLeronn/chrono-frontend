@@ -420,6 +420,17 @@ Não enviar IDs internos no payload dos itens. Explicar que editar um modelo nã
 - Verificações: `yarn typecheck`, `yarn lint`, `yarn build` e `git diff --check`. Nenhum teste automatizado, dependência nova ou alteração de backend.
 - Limites: listagem/criação/detalhe autenticados, paginação real e inspeção visual (desktop/mobile, foco, teclado, zoom) não reproduzidos. A recusa anterior de acesso local foi preservada. Próximo passo: revisão do editor de 11A antes de autorizar 11B (edição de nome/itens).
 
+### Entrega da etapa 11B — aguardando revisão
+
+- Implementada `/modelos/[id]/editar`, acessível pelo detalhe, reutilizando o editor de 11A com dados frescos e o padrão visual existente. Nome, categoria, título, dia semanal, descrição e horários são editáveis; adicionar/remover itens mantém chaves locais estáveis e comportamento de foco. Limite de 200 itens e modelo vazio preservados.
+- PATCH `/week-templates/:id` envia apenas `name`, `items` ou ambos conforme diferenças normalizadas em relação à edição aberta. Alterar somente o nome omite `items`; qualquer alteração na coleção envia a lista completa, sem IDs ou chaves locais. Remover todos envia `items: []`. Envio sem mudanças não faz mutação.
+- Leitura do FormData compartilhada com criação, validação no cliente/servidor e limite de 100 KB aplicado ao payload efetivo. A action verifica sessão e modelo atual, recusando edição quando `updatedAt` mudou desde a abertura. Nenhum retry automático.
+- Erros de sessão, modelo indisponível/arquivado, campos inválidos, versão alterada e resultado incerto preservam o preenchimento. Links em outra aba permitem consultar o modelo atual ou fazer login. Sucesso exige resposta 200 válida com o mesmo ID, invalida lista/detalhe/edição e abre detalhe fresco com confirmação.
+- Interface explica que salvar, esvaziar ou reaplicar o modelo não altera eventos já criados. Aplicação e arquivamento permanecem nas etapas 11C/11D; nenhuma alteração de calendário foi antecipada.
+- Arquivos: `src/app/modelos/[id]/editar/{page.tsx,actions.ts}`, detalhe, editor/actions/state compartilhados, `src/lib/template-input.ts`, model e transporte/API de modelos, README e plano.
+- Verificações: `yarn typecheck`, `yarn lint`, `yarn build` e `git diff --check`. Nenhum teste automatizado, dependência nova ou mudança no backend.
+- Limites: edição autenticada, preservação de cópias existentes e inspeção visual (desktop/mobile, foco, teclado, zoom) não reproduzidos. A consulta anterior ao PATCH não oferece proteção atômica contra concorrência; o contrato não tem versionamento condicional. Próximo passo: revisão de 11B antes de autorizar 11C (aplicação semanal).
+
 ## Etapa 12 — revisão integrada e documentação
 
 **Entrega:** revisão final dos fluxos já implementados, sem expansão de escopo.
@@ -447,4 +458,4 @@ Preencher ao concluir cada etapa:
 
 Situações sugeridas: não iniciada, em implementação, aguardando revisão, aprovada.
 
-**Próxima ação:** revisar a etapa 11A implementada, especialmente o editor de itens. A etapa 11B (edição de nome/itens de modelos salvos) depende de nova autorização. Os registros anteriores são históricos; a continuidade atual está na entrega 11A.
+**Próxima ação:** revisar a etapa 11B implementada. A etapa 11C (aplicação semanal e reaplicação idempotente) depende de nova autorização. Os registros anteriores são históricos; a continuidade atual está na entrega 11B.

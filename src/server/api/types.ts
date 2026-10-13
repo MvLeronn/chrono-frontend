@@ -1,5 +1,5 @@
 import type { CreateEventInput, UpdateEventInput } from "../../models/event";
-import type { CreateTemplateInput } from "../../models/template";
+import type { CreateTemplateInput, UpdateTemplateInput } from "../../models/template";
 import type { UpdateOccurrenceInput } from "../../models/occurrence";
 import type { CreateRecurringInput, SplitRecurringInput, EndRecurringInput } from "../../models/recurring";
 
@@ -77,4 +77,8 @@ export type ApiRequest = {
 } | {
   path: "template-create";
   input: CreateTemplateInput;
+} | {
+  path: "template-update";
+  id: string;
+  input: UpdateTemplateInput;
 };

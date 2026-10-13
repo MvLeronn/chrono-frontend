@@ -9,6 +9,7 @@ interface TemplatePageProps {
   }>;
   searchParams: Promise<{
     created?: string | string[];
+    updated?: string | string[];
   }>;
 }
 
@@ -27,7 +28,9 @@ export default async function TemplatePage({ params, searchParams }: TemplatePag
   return <div className="mx-auto max-w-3xl space-y-6">
     <Link href="/modelos" className={link}>Voltar aos modelos</Link>
     {query.created === "1" && <p role="status" className="rounded-control bg-status-completed-soft p-3 text-sm text-status-completed">Modelo criado. Nenhuma atividade foi adicionada ao calendário.</p>}
+    {query.updated === "1" && <p role="status" className="rounded-control bg-status-completed-soft p-3 text-sm text-status-completed">Modelo atualizado. As atividades já criadas foram preservadas.</p>}
     <header className="space-y-2"><p className="text-sm text-text-secondary">Modelo semanal · {item.items.length} {item.items.length === 1 ? "item" : "itens"}</p><h1 className="wrap-anywhere text-2xl font-semibold">{item.name}</h1><p className="text-sm text-text-secondary">Este modelo é uma definição de semana. Alterações no modelo não modificam atividades já criadas a partir dele.</p></header>
+    <Link href={`/modelos/${id}/editar`} prefetch={false} className={link}>Editar modelo</Link>
     {item.items.length === 0 ? <div className="space-y-2 rounded-surface border border-border bg-surface p-6"><h2 className="font-semibold">Modelo vazio</h2><p className="text-text-secondary">Este modelo foi salvo sem itens.</p></div> : <div className="divide-y divide-border rounded-surface border border-border bg-surface px-4 sm:px-6">{weekdays.map((day, index) => {
       const entries = item.items.filter((entry) => entry.weekday === index + 1);
       return <section key={day} aria-labelledby={`weekday-${index}`} className="grid gap-3 py-5 sm:grid-cols-[9rem_minmax(0,1fr)]"><h2 id={`weekday-${index}`} className="text-sm font-semibold text-primary">{day}</h2>{entries.length ? <ul className="min-w-0 space-y-5">{entries.map((entry) => <li key={entry.id} className="space-y-1"><p className="text-xs text-text-secondary">{entry.type === "TASK" ? "Tarefa" : "Evento"} · <span className="tabular-nums">{entry.startTime ? `${entry.startTime}${entry.endTime ? ` – ${entry.endTime}` : " · Sem horário de fim"}` : "Sem horário"}</span></p><h3 className="wrap-anywhere font-semibold">{entry.title}</h3>{entry.description && <p className="wrap-anywhere whitespace-pre-wrap text-sm text-text-secondary">{entry.description}</p>}</li>)}</ul> : <p className="text-sm text-text-secondary">Sem itens</p>}</section>;

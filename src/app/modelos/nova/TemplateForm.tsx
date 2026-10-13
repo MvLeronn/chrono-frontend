@@ -13,14 +13,21 @@ import type { TemplateDraft, TemplateItemDraft, TemplateFormState } from "./stat
 const control = "min-h-11 w-full min-w-0 rounded-control border border-text-secondary bg-surface px-3 py-2 text-base aria-invalid:border-error disabled:bg-background disabled:text-text-secondary";
 const labels = { weekday: "Dia da semana", type: "Categoria", title: "Título", description: "Descrição (opcional)", startTime: "Início (opcional)", endTime: "Fim (opcional)" };
 
-export function TemplateForm() {
-  const [draft, setDraft] = useState<TemplateDraft>({ name: "", items: [] });
-  const [state, action, pending] = useActionState(createTemplateAction, {} as TemplateFormState);
+interface TemplateFormProps {
+  initialDraft?: TemplateDraft;
+  saveAction?: (previous: TemplateFormState, formData: FormData) => Promise<TemplateFormState>;
+  detailHref?: string;
+}
+
+export function TemplateForm({ initialDraft, saveAction, detailHref = "/modelos" }: TemplateFormProps) {
+  const editing = Boolean(initialDraft);
+  const [draft, setDraft] = useState<TemplateDraft>(initialDraft ?? { name: "", items: [] });
+  const [state, action, pending] = useActionState(saveAction ?? createTemplateAction, {} as TemplateFormState);
   const [localErrors, setLocalErrors] = useState<Record<string, string>>();
   const errors = localErrors ?? state.errors;
   const form = useRef<HTMLFormElement>(null);
   const submitted = useRef(false);
-  const nextKey = useRef(0);
+  const nextKey = useRef(initialDraft?.items.length ?? 0);
   const focusTarget = useRef<string | null>(null);
 
   useEffect(() => {
@@ -40,7 +47,7 @@ export function TemplateForm() {
 
   function submit(event: FormEvent<HTMLFormElement>) {
     if (pending || submitted.current) { event.preventDefault(); return; }
-    const validation = validateTemplate(draft);
+    const validation = validateTemplate(draft, initialDraft);
     setLocalErrors(validation);
     const first = Object.keys(validation)[0];
     if (first) {
@@ -80,12 +87,12 @@ export function TemplateForm() {
   }
 
   return <form ref={form} action={action} onSubmit={submit} noValidate className="space-y-6 rounded-surface border border-border bg-surface p-4 sm:p-6">
-    {state.message && <div role="alert" tabIndex={-1} className="space-y-2 rounded-control bg-error-soft p-3 text-sm text-error"><p>{state.message}</p>{(state.expired || state.uncertain) && <a href={state.expired ? "/login" : "/modelos"} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold underline">{state.expired ? "Abrir login em outra aba" : "Conferir modelos em outra aba"}</a>}</div>}
+    {state.message && <div role="alert" tabIndex={-1} className="space-y-2 rounded-control bg-error-soft p-3 text-sm text-error"><p>{state.message}</p>{(state.expired || state.uncertain || state.stale) && <a href={state.expired ? "/login" : detailHref} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold underline">{state.expired ? "Abrir login em outra aba" : editing ? "Conferir modelo em outra aba" : "Conferir modelos em outra aba"}</a>}</div>}
     <fieldset disabled={pending} className="min-w-0 space-y-6">
       <legend className="sr-only">Definição do modelo semanal</legend>
       <div className="space-y-2"><Label htmlFor="name">Nome do modelo</Label><input id="name" name="name" required maxLength={100} value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} aria-invalid={Boolean(errors?.name) || undefined} aria-describedby={errors?.name ? "name-error" : undefined} className={control} />{errors?.name && <FieldError id="name-error">{errors.name}</FieldError>}</div>
       <div className="space-y-2 border-t border-border pt-5"><h2 className="font-semibold">Itens da semana</h2><p className="text-sm text-text-secondary">Defina o dia de cada atividade. Deixe os horários vazios para uma atividade sem horário, ou informe apenas o início.</p><p role="status" className="text-sm tabular-nums text-text-secondary">{draft.items.length} de 200 itens</p><div id="items" tabIndex={-1}>{errors?.items && <FieldError role="alert">{errors.items}</FieldError>}</div></div>
-      {draft.items.length === 0 && <p className="text-sm text-text-secondary">Nenhum item adicionado. Você pode criar um modelo vazio ou adicionar a primeira atividade abaixo.</p>}
+      {draft.items.length === 0 && <p className="text-sm text-text-secondary">{editing ? "Ao salvar, o modelo ficará sem itens. As atividades já criadas não serão removidas." : "Nenhum item adicionado. Você pode criar um modelo vazio ou adicionar a primeira atividade abaixo."}</p>}
       <div className="space-y-6">{draft.items.map((item, index) => <fieldset key={item.key} className="grid min-w-0 gap-4 border-t border-border pt-4 sm:grid-cols-2">
         <legend className="pr-3 text-sm font-semibold">Item {index + 1}</legend>
         <input type="hidden" name="itemKey" value={item.key} />
@@ -94,7 +101,7 @@ export function TemplateForm() {
       </fieldset>)}</div>
       <button id="add-item" type="button" disabled={draft.items.length >= 200} onClick={addItem} className="inline-flex min-h-11 items-center rounded-control border border-text-secondary px-4 py-2 text-sm font-semibold text-primary enabled:hover:bg-background disabled:text-text-secondary">Adicionar item</button>
     </fieldset>
-    <div className="flex flex-wrap items-center gap-4 border-t border-border pt-5"><Button type="submit" loading={pending} loadingLabel="Criando…">Criar modelo</Button>{!pending && <Link href="/modelos" className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">Voltar aos modelos</Link>}</div>
-    <p className="text-sm text-text-secondary">Criar o modelo não adiciona atividades ao calendário.</p>
+    <div className="flex flex-wrap items-center gap-4 border-t border-border pt-5"><Button type="submit" loading={pending} loadingLabel={editing ? "Salvando…" : "Criando…"}>{editing ? "Salvar alterações" : "Criar modelo"}</Button>{!pending && <Link href={detailHref} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">{editing ? "Voltar ao modelo" : "Voltar aos modelos"}</Link>}</div>
+    <p className="text-sm text-text-secondary">{editing ? "As alterações valem para futuras aplicações do modelo. Semanas já preenchidas não são atualizadas ao salvar ou reaplicar o modelo." : "Criar o modelo não adiciona atividades ao calendário."}</p>
   </form>;
 }

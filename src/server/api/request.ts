@@ -34,7 +34,7 @@ export async function requestApi(request: ApiRequest): Promise<ApiResult<unknown
       : request.path === "recurring-split" ? `recurring-events/${encodeURIComponent(request.id)}/split`
       : request.path === "recurring-detail" ? `recurring-events/${encodeURIComponent(request.id)}`
       : request.path === "recurring-list" || request.path === "recurring-create" ? "recurring-events"
-      : request.path === "template-detail" ? `week-templates/${encodeURIComponent(request.id)}`
+      : request.path === "template-detail" || request.path === "template-update" ? `week-templates/${encodeURIComponent(request.id)}`
       : request.path === "template-list" || request.path === "template-create" ? "week-templates"
       : "id" in request ? `events/${encodeURIComponent(request.id)}` : request.path;
     const url = new URL(path, base);
@@ -47,7 +47,7 @@ export async function requestApi(request: ApiRequest): Promise<ApiResult<unknown
       url.searchParams.set("limit", String(request.limit));
     }
     const response = await fetch(url, {
-      method: request.path === "event-update" || request.path === "occurrence-update" ? "PATCH" : request.path === "event-delete" || request.path === "occurrence-reset" ? "DELETE" : body ? "POST" : "GET",
+      method: request.path === "event-update" || request.path === "occurrence-update" || request.path === "template-update" ? "PATCH" : request.path === "event-delete" || request.path === "occurrence-reset" ? "DELETE" : body ? "POST" : "GET",
       headers,
       body: body ? JSON.stringify(body) : undefined,
       cache: "no-store",

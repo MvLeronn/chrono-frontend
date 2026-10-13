@@ -14,6 +14,8 @@ export interface CreateTemplateInput {
   items: TemplateItemInput[];
 }
 
+export type UpdateTemplateInput = Partial<CreateTemplateInput>;
+
 export interface TemplateItemResponse extends TemplateItemInput {
   id: string;
   templateId: string;

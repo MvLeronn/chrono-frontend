@@ -18,4 +18,5 @@ export interface TemplateFormState {
   message?: string;
   expired?: boolean;
   uncertain?: boolean;
+  stale?: boolean;
 }

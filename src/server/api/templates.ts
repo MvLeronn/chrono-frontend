@@ -1,7 +1,7 @@
 import "server-only";
 import { isLocalTime } from "../../lib/event-input";
 import { invalidResponse, isRecord, requestApi } from "./request";
-import type { CreateTemplateInput, TemplateListResponse, TemplateResponse } from "../../models/template";
+import type { CreateTemplateInput, TemplateListResponse, TemplateResponse, UpdateTemplateInput } from "../../models/template";
 import type { ApiResult } from "./types";
 
 const uuid = (value: unknown): value is string => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
@@ -42,4 +42,11 @@ export async function createTemplate(input: CreateTemplateInput): Promise<ApiRes
   if (!result.ok) return result;
   if (result.status !== 201 || !isTemplate(result.data)) return invalidResponse(result.status);
   return { ok: true, status: 201, data: result.data };
+}
+
+export async function updateTemplate(id: string, input: UpdateTemplateInput): Promise<ApiResult<TemplateResponse>> {
+  const result = await requestApi({ path: "template-update", id, input });
+  if (!result.ok) return result;
+  if (result.status !== 200 || !isTemplate(result.data) || result.data.id !== id) return invalidResponse(result.status);
+  return { ok: true, status: 200, data: result.data };
 }

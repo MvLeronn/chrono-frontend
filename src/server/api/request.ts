@@ -24,17 +24,20 @@ export async function requestApi(request: ApiRequest): Promise<ApiResult<unknown
   }
   const base = getApiBaseUrl();
   if (!base) return { ok: false, status: null, code: "CONFIGURATION_ERROR", message: "O serviço de acesso não está configurado. Tente novamente mais tarde." };
-  const body = isLogin ? { password: request.password } : request.path === "events" || request.path === "event-update" ? request.input : undefined;
+  const body = isLogin ? { password: request.password } : "input" in request ? request.input : undefined;
   if (body) headers.set("Content-Type", "application/json");
   const signal = AbortSignal.timeout(10_000);
   try {
-    const url = new URL("id" in request ? `events/${encodeURIComponent(request.id)}` : request.path, base);
+    const path = "occurrenceDate" in request
+      ? `recurring-events/${encodeURIComponent(request.id)}/occurrences/${encodeURIComponent(request.occurrenceDate)}${request.path === "occurrence-reset" ? "/state" : ""}`
+      : "id" in request ? `events/${encodeURIComponent(request.id)}` : request.path;
+    const url = new URL(path, base);
     if (request.path === "calendar") {
       url.searchParams.set("from", request.from);
       url.searchParams.set("to", request.to);
     }
     const response = await fetch(url, {
-      method: request.path === "event-update" ? "PATCH" : request.path === "event-delete" ? "DELETE" : body ? "POST" : "GET",
+      method: request.path === "event-update" || request.path === "occurrence-update" ? "PATCH" : request.path === "event-delete" || request.path === "occurrence-reset" ? "DELETE" : body ? "POST" : "GET",
       headers,
       body: body ? JSON.stringify(body) : undefined,
       cache: "no-store",

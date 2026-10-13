@@ -1,4 +1,5 @@
 import type { CreateEventInput, UpdateEventInput } from "../../models/event";
+import type { UpdateOccurrenceInput } from "../../models/occurrence";
 
 export interface ApiFailure {
   ok: false;
@@ -37,4 +38,13 @@ export type ApiRequest = {
 } | {
   path: "event-delete";
   id: string;
+} | {
+  path: "occurrence-detail" | "occurrence-reset";
+  id: string;
+  occurrenceDate: string;
+} | {
+  path: "occurrence-update";
+  id: string;
+  occurrenceDate: string;
+  input: UpdateOccurrenceInput;
 };

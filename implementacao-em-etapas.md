@@ -344,6 +344,17 @@ Dividir em duas entregas:
 
 **Validar:** ocorrência virtual, personalização, herança, reagendamento e reset com API real quando disponível.
 
+### Entrega da etapa 9 — aguardando revisão
+
+- Implementação autorizada pelo pedido de iniciar a próxima etapa após 8B. Preservados tokens, fonte local e controles; editor em superfície contínua, seções por campo, data original visível e confirmação de restauração em expansão nativa. Sem operações sobre a série.
+- Rota protegida `/ocorrencias/[id]/[date]` usa ID do segmento e data original, nunca ID do estado ou data reagendada. Leitura `no-store` valida identidade e estrutura; links em `ActivityRow` alcançam ocorrências virtuais e persistidas em todas as visualizações. A chave de calendário permanece estável.
+- Editor começa com Manter sem alteração para título/categoria/descrição/horários. Personalizar e Herdar são decisões explícitas: campos mantidos são omitidos, herança envia `null`, descrição vazia envia `""` e horários removidos enviam o par de nulos. Personalizar o mesmo valor aparente ainda é uma mudança intencional de herança. Data/status são comparados com o snapshot aberto; envio vazio não materializa estado.
+- Retorno à data original mantém demais escolhas. Restauração completa exige checkbox de confirmação e informa perda de personalizações, reagendamento, status, conclusão e draft não salvo. DELETE `/state` valida 200 com JSON, ID nulo, data original, PENDING e conclusão nula; não equivale a excluir a ocorrência.
+- Server Action verifica sessão, consulta ocorrência e valida escolhas/campos. Formulário controlado preserva preenchimento em erro, bloqueia envio simultâneo e oferece recuperação para sessão expirada e resultado incerto. Sucesso invalida rota/calendário e carrega valores frescos. Nenhum retry de mutação, token no client ou alteração no backend.
+- Arquivos: `src/app/ocorrencias/layout.tsx`, `src/app/ocorrencias/[id]/[date]/{page.tsx,OccurrenceForm.tsx,actions.ts,state.ts}`, `src/lib/occurrence-input.ts`, `src/models/occurrence.ts`, `src/server/api/occurrences.ts`, transporte e `ActivityRow.tsx`; README atualizado.
+- Verificações: `yarn typecheck`, `yarn lint`, `yarn build` e `git diff --check` passaram. Revisão estática das semânticas de omissão/null/vazio, identidade, tipos de resposta e confirmação. Nenhum teste automatizado ou dependência nova.
+- Limites: sem reprodução autenticada de ocorrência virtual, personalização, herança, reagendamento, reset ou falhas reais. Inspeção visual, teclado, foco, mobile e zoom permanecem pendentes. A API não expõe origem de cada campo nem controle de concorrência por versão; a tela não infere essas informações. Próximo passo: revisão da etapa 9; depois, etapa 10A mediante autorização.
+
 ## Etapa 10 — recorrências
 
 Executar uma subetapa por vez:
@@ -392,4 +403,4 @@ Preencher ao concluir cada etapa:
 
 Situações sugeridas: não iniciada, em implementação, aguardando revisão, aprovada.
 
-**Próxima ação:** revisar a etapa 8B implementada. A etapa 9 (ocorrência individual) depende de nova autorização. Os registros de etapas anteriores acima são históricos; a continuidade atual está na entrega 8B.
+**Próxima ação:** revisar a etapa 9 implementada. A etapa 10A (criação, listagem e detalhe de regras recorrentes) depende de nova autorização. Os registros de etapas anteriores acima são históricos; a continuidade atual está na entrega 9.

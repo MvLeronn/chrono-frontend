@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { occurrenceHref } from "../../lib/occurrence-input";
 import type { ActivityStatus } from "../../models/calendar";
 import type { CalendarItem } from "../../models/calendar";
 
@@ -29,7 +30,7 @@ export function ActivityRow({ item, id }: ActivityRowProps) {
       </p>
       <div className="min-w-0 space-y-2">
         <h3 className="wrap-anywhere font-semibold">{item.title}</h3>
-        {item.source === "EVENT" && <Link href={`/atividades/${item.id}`} prefetch={false} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">Ver detalhes</Link>}
+        <Link href={item.source === "EVENT" ? `/atividades/${item.id}` : occurrenceHref(item.recurringEventId, item.occurrenceDate)} prefetch={false} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">{item.source === "EVENT" ? "Ver detalhes" : "Ver ocorrência"}</Link>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-text-secondary">
           <span>{item.type === "TASK" ? "Tarefa" : "Evento"}</span>
           <span className={`rounded-control px-2 py-1 font-semibold ${status.className}`}>{status.label}</span>

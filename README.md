@@ -58,7 +58,13 @@ O backend não possui idempotência para criação: falhas de conexão ou respos
 
 O detalhe oferece exclusão com confirmação explícita e explica a diferença para o status Cancelado. DELETE exige resposta 204 e não lê JSON. Excluir cópia de modelo preserva a aplicação; reaplicar a mesma semana não recria a cópia. Sucesso atualiza detalhe/calendário e mostra feedback; falhas preservam o editor e resultados incertos orientam conferir a agenda antes de repetir, sem retry automático.
 
-Validação da etapa 8B: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check` passaram; sem testes automatizados novos. Edição/exclusão autenticadas e comportamento visual não foram reproduzidos. Desktop/mobile, teclado, foco e zoom permanecem pendentes. A etapa 8B aguarda revisão; ocorrências individuais ficam para a etapa 9.
+`/ocorrencias/[id]/[date]` consulta e edita somente uma ocorrência (etapa 9). O endereço usa o ID do segmento e a data original, inclusive após reagendamento ou enquanto o ID do estado é nulo. Os links ficam na apresentação completa das atividades em todas as visualizações; a chave visual do calendário continua sendo `calendarKey`.
+
+Título, categoria, descrição e horários começam em Manter sem alteração. Personalizar cria uma alteração intencional somente nesse campo; Herdar envia `null`. Descrição personalizada vazia envia `""`; remover horários envia o par `{ startTime: null, endTime: null }`, diferente de herdar horários. Data/status são enviados somente quando mudam. Envio sem alteração não faz PATCH nem cria estado persistido. A API retorna valores resolvidos, sem informar a origem individual de cada campo; o editor não tenta inferir quais já são personalizados.
+
+Voltar à data original altera somente o reagendamento ao salvar. Restaurar ocorrência exige confirmação e remove todo o estado, inclusive personalizações, reagendamento, status e conclusão; a ocorrência continua existindo, pendente e herdando a regra. DELETE `/state` exige 200 com JSON e a resposta virtual esperada. A tela faz leitura fresca após sucesso e invalida o calendário. Falhas preservam o formulário, sem retry automático; mudanças na recorrência que invalidem o endereço orientam retornar ao calendário.
+
+Validação da etapa 9: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check` passaram; sem testes automatizados novos. Personalização, herança, reagendamento e restauração autenticados não foram reproduzidos contra a API. Desktop/mobile, teclado, foco e zoom permanecem pendentes. A etapa 9 aguarda revisão; criação/listagem/detalhe de regras ficam para a etapa 10A.
 
 O Yarn informa um peer transitivo ausente de `eslint` em `@next/eslint-plugin-next`, embora o projeto forneça ESLint. O lint deve ser validado antes de aceitar futuras atualizações. O aviso de scripts bloqueados de `unrs-resolver` é esperado pela política de instalação.
 

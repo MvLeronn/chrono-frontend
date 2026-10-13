@@ -222,6 +222,17 @@ o, a desenvolver nas etapas do calendário. Evitar cartões decorativos e sombra
 
 **Ponto de revisão:** aprovar o padrão de leitura antes de criar grades mais complexas.
 
+### Entrega da etapa 6 — aguardando revisão
+
+- Implementada leitura real de `GET /calendar?from=…&to=…` em `src/server/api/calendar.ts`, pelo transporte `server-only` existente. Resposta validada estruturalmente, incluindo datas, horários, origem, chaves únicas e intervalo retornado. Não há mocks, novos endpoints ou alterações no backend.
+- Tipos públicos em `src/lib/calendar-types.ts`; helpers em `calendar-date.ts` validam intervalo inclusivo de 1–366 dias e limitam navegação a 0001–9999. A URL `/?from=YYYY-MM-DD&to=YYYY-MM-DD` define o período. Padrão de sete dias a partir de hoje; `?date=` da fase 5 continua aceito. Hoje é calculado uma vez no servidor, no fuso da conta, e compartilhado com a agenda.
+- `CalendarToolbar.tsx` permite escolher início/fim e navegar entre períodos. Intervalos inválidos mostram orientação e não disparam leitura. A prévia e o botão de criação indisponível foram removidos; criar/editar continua fora do escopo.
+- `Agenda.tsx` agrupa itens por data e mostra categoria, status textual com cores aprovadas, origem e horários. Descrição usa expansão nativa. Itens sem horário ou sem fim não recebem duração inventada. Concluídos/cancelados permanecem visíveis; ocorrências virtuais usam `calendarKey`, independentemente de `id` nulo.
+- `AgendaLoading.tsx`, Suspense por período, `app/loading.tsx` e `app/error.tsx` cobrem carregamento e falhas. Erros de API distinguem timeout/resposta inválida/indisponibilidade; nova tentativa recarrega o mesmo período. HTTP 401 redireciona ao login. Consulta inicial apenas no Server Component, sem fetch client, efeito no mount ou prefetch dos links de período.
+- Verificações: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check`. Nenhuma dependência ou teste automatizado adicionado. A execução de lint/TypeScript fora do sandbox usa o Yarn local após bloqueio de rede do Corepack no ambiente restrito.
+- Limites: não houve validação autenticada de `GET /calendar` nem reprodução de vazio/erro/ocorrência virtual contra a API. A recusa de acesso ao navegador local registrada na fase 5 foi respeitada; não se contornou a restrição. Desktop/mobile, teclado, zoom e comportamento de rede permanecem pendentes de inspeção manual; a ausência de busca no mount foi conferida no código.
+- Próximo passo: revisão da agenda pelo usuário; somente após autorização, etapa 7A (mês). Criação/edição permanece na etapa 8.
+
 ## Etapa 7 — visualizações do calendário, separadamente
 
 Cada subetapa exige uma entrega e uma revisão próprias:

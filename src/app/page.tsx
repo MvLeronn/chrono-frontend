@@ -4,10 +4,13 @@ import { getCurrentUser } from "../server/api/auth";
 import { logoutAction } from "./actions/session";
 import { Button } from "../components/ui/Button";
 import { PrivateShell } from "../components/PrivateShell";
-import { CalendarPreview } from "../components/calendar/CalendarPreview";
-import { parseCalendarDate, todayInTimezone } from "../lib/calendar-date";
+import { Suspense } from "react";
+import { Agenda } from "../components/calendar/Agenda";
+import { AgendaLoading } from "../components/calendar/AgendaLoading";
+import { CalendarToolbar } from "../components/calendar/CalendarToolbar";
+import { defaultRange, formatCalendarDate, isValidRange, parseCalendarDate, todayInTimezone } from "../lib/calendar-date";
 
-export default async function HomePage({ searchParams }: { searchParams: Promise<{ date?: string | string[] }> }) {
+export default async function HomePage({ searchParams }: { searchParams: Promise<{ date?: string | string[]; from?: string | string[]; to?: string | string[] }> }) {
   const session = await getCurrentUser();
   if (!session.ok && session.status === 401) {
     redirect(session.code === "NO_SESSION" ? "/login" : "/login?reason=expired");
@@ -16,12 +19,29 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   if (session.ok) {
     const params = await searchParams;
     const today = todayInTimezone(session.data.timezone);
-    const validDate = typeof params.date === "string" && parseCalendarDate(params.date) !== null;
-    const selectedDate = typeof params.date === "string" && validDate ? params.date : today;
+    const legacyDate = typeof params.date === "string" && parseCalendarDate(params.date) ? params.date : today;
+    const candidate = typeof params.from === "string" && typeof params.to === "string" ? { from: params.from, to: params.to } : null;
+    const hasRange = params.from !== undefined || params.to !== undefined;
+    const invalidRange = hasRange ? !candidate || !isValidRange(candidate) : params.date !== undefined && legacyDate === today && params.date !== today;
+    const range = candidate && isValidRange(candidate) ? candidate : defaultRange(legacyDate);
 
     return (
       <PrivateShell>
-        <CalendarPreview selectedDate={selectedDate} today={today} timezone={session.data.timezone} invalidDate={params.date !== undefined && !validDate} />
+        <header className="mb-6 space-y-1">
+          <h1 id="calendar-title" className="text-2xl font-semibold leading-8">Calendário</h1>
+          <p className="text-text-secondary">Agenda de eventos e tarefas.</p>
+        </header>
+        <section aria-labelledby="calendar-title" className="overflow-hidden rounded-surface border border-border bg-surface">
+          <CalendarToolbar range={range} today={today} />
+          {invalidRange ? (
+            <p role="alert" className="px-4 py-8 text-sm text-error sm:px-6">Período inválido. Escolha datas entre 0001 e 9999, com o fim igual ou posterior ao início e no máximo 366 dias. Ajuste os campos acima para consultar a agenda.</p>
+          ) : (
+            <>
+              <p className="border-b border-border px-4 py-4 text-sm font-semibold tabular-nums sm:px-6">{formatCalendarDate(range.from, { day: "numeric", month: "long", year: "numeric" })} a {formatCalendarDate(range.to, { day: "numeric", month: "long", year: "numeric" })}</p>
+              <Suspense key={`${range.from}:${range.to}`} fallback={<AgendaLoading />}><Agenda range={range} today={today} /></Suspense>
+            </>
+          )}
+        </section>
       </PrivateShell>
     );
   }

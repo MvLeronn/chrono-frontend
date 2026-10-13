@@ -1,3 +1,5 @@
+import type { CalendarRange } from "./calendar-types";
+
 // Civil dates use UTC only for arithmetic and formatting, never as local instants.
 export function parseCalendarDate(value: string): Date | null {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || value < "0001-01-01" || value > "9999-12-31") return null;
@@ -25,4 +27,33 @@ export function formatCalendarDate(value: string, options: Intl.DateTimeFormatOp
   const date = parseCalendarDate(value);
   if (!date) return "";
   return new Intl.DateTimeFormat("pt-BR", { ...options, timeZone: "UTC" }).format(date);
+}
+
+export function rangeLength(range: CalendarRange): number {
+  const from = parseCalendarDate(range.from);
+  const to = parseCalendarDate(range.to);
+  return from && to ? (to.getTime() - from.getTime()) / 86_400_000 + 1 : 0;
+}
+
+export function isValidRange(range: CalendarRange): boolean {
+  const length = rangeLength(range);
+  return length >= 1 && length <= 366;
+}
+
+export function defaultRange(date: string): CalendarRange {
+  return { from: date, to: adjacentDate(date, 6) ?? "9999-12-31" };
+}
+
+export function shiftRange(range: CalendarRange, direction: -1 | 1): CalendarRange | null {
+  const length = rangeLength(range);
+  if (direction === -1) {
+    const to = adjacentDate(range.from, -1);
+    return to ? { from: adjacentDate(to, -(length - 1)) ?? "0001-01-01", to } : null;
+  }
+  const from = adjacentDate(range.to, 1);
+  return from ? { from, to: adjacentDate(from, length - 1) ?? "9999-12-31" } : null;
+}
+
+export function calendarHref(range: CalendarRange): string {
+  return `/?from=${range.from}&to=${range.to}`;
 }

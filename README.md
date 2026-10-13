@@ -1,6 +1,6 @@
 # Chrono frontend
 
-Base em Next.js App Router, React e TypeScript estrito, com Tailwind CSS e Lucide. Login, consulta de sessão e logout local estão integrados. A etapa 5 adiciona à raiz uma composição privada do calendário, com navegação responsiva e seleção de data. A prévia ainda não consulta atividades; criação e grades serão implementadas nas etapas seguintes.
+Base em Next.js App Router, React e TypeScript estrito, com Tailwind CSS e Lucide. Login, consulta de sessão e logout local estão integrados. A etapa 6 implementa a agenda por período com leitura real no servidor, agrupamento por dia e estados de carregamento, vazio e falha. Criação e grades serão implementadas nas etapas seguintes.
 
 ## Ambiente e instalação
 
@@ -36,9 +36,11 @@ O formulário envia somente a senha para a Server Action, que chama `POST /auth/
 
 A raiz e o login consultam `GET /auth/me` no servidor para conferir a sessão. Um cookie presente não é prova de acesso. HTTP 401 retorna ao login sem loop; falhas de rede/serviço não são tratadas como senha incorreta. O transporte usa `no-store`, timeout de 10 segundos e não repete mutações automaticamente. Logout apaga o cookie por Server Action, sem endpoint fictício ou refresh token; não revoga cópias externas do JWT.
 
-`src/components/PrivateShell.tsx` organiza a área privada; `src/components/calendar` contém a toolbar e a prévia. A data fica em `/?date=YYYY-MM-DD`, com anterior/próximo/hoje e formulário nativo. Hoje é calculado no servidor no fuso da conta; datas inválidas exibem aviso e retornam a hoje. Nenhuma consulta a `GET /calendar` é feita nesta etapa.
+`src/components/PrivateShell.tsx` organiza a área privada; `src/components/calendar` contém a toolbar e a agenda. O período fica em `/?from=YYYY-MM-DD&to=YYYY-MM-DD`, com anterior/próximo/hoje e formulário nativo. O padrão é de sete dias; `?date=` continua aceito como início desse período. Hoje é calculado no servidor no fuso da conta. Intervalos inválidos ou acima de 366 dias exibem orientação sem consultar a API.
 
-Validação da etapa 5: `yarn lint`, `yarn typecheck`, `yarn build` e `git diff --check` passaram. A política do navegador bloqueou o acesso local por permissão recusada; a revisão visual em desktop/mobile, teclado e zoom de 200% permanece pendente. Não há testes automatizados novos. Na etapa 4, o usuário confirmou login real bem-sucedido; logout autenticado, expiração natural, timeout e respostas malformadas continuam sem reprodução manual. A composição da etapa 5 aguarda revisão antes da leitura real da agenda.
+`src/server/api/calendar.ts` consulta `GET /calendar` com autenticação e `no-store`, valida a resposta e ordena por data, horário e `calendarKey`. A agenda exibe todos os status e distingue categoria de origem, inclusive cópias de modelos e ocorrências virtuais. Não há busca no mount, proxy público ou token nas props. A nova tentativa de falha preserva o período.
+
+Validação da etapa 6: lint, TypeScript, build e diff conferidos; sem testes automatizados novos. A consulta autenticada e seus estados não foram reproduzidos contra a API nesta etapa. A recusa de acesso ao navegador local registrada na etapa 5 foi respeitada; desktop/mobile, teclado e zoom permanecem pendentes. A agenda aguarda revisão antes da grade mensal (7A).
 
 O Yarn informa um peer transitivo ausente de `eslint` em `@next/eslint-plugin-next`, embora o projeto forneça ESLint. O lint deve ser validado antes de aceitar futuras atualizações. O aviso de scripts bloqueados de `unrs-resolver` é esperado pela política de instalação.
 

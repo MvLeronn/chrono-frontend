@@ -21,11 +21,12 @@ export function invalidResponse(status: number): ApiFailure {
 }
 
 // Paths and payloads are selected by server wrappers, never by the browser.
-type AuthRequest =
+type ApiRequest =
   | { path: "auth/login"; password: string }
-  | { path: "auth/me" };
+  | { path: "auth/me" }
+  | { path: "calendar"; from: string; to: string };
 
-export async function requestApi(request: AuthRequest): Promise<ApiResult<unknown>> {
+export async function requestApi(request: ApiRequest): Promise<ApiResult<unknown>> {
   const headers = new Headers({ Accept: "application/json" });
   const isLogin = request.path === "auth/login";
   if (!isLogin) {
@@ -41,7 +42,12 @@ export async function requestApi(request: AuthRequest): Promise<ApiResult<unknow
   if (isLogin) headers.set("Content-Type", "application/json");
   const signal = AbortSignal.timeout(10_000);
   try {
-    const response = await fetch(new URL(request.path, base), {
+    const url = new URL(request.path, base);
+    if (request.path === "calendar") {
+      url.searchParams.set("from", request.from);
+      url.searchParams.set("to", request.to);
+    }
+    const response = await fetch(url, {
       method: isLogin ? "POST" : "GET",
       headers,
       body: isLogin ? JSON.stringify({ password: request.password }) : undefined,

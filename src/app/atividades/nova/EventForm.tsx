@@ -51,7 +51,7 @@ export function EventForm({ date, time, initialDraft, saveAction, cancelHref, on
   }
   function update(key: keyof EventDraft, value: string) { setDraft((current) => ({ ...current, [key]: value })); }
   return (
-    <FormSurface ref={form} action={action} onSubmit={submit} noValidate embedded={Boolean(onCancel)} className="space-y-6">
+    <FormSurface ref={form} action={action} onSubmit={submit} noValidate embedded={Boolean(onCancel)} className="space-y-4">
       {state.message && <div role="alert" tabIndex={-1} className="space-y-2 rounded-control bg-error-soft p-3 text-sm text-error"><p>{state.message}</p>{(state.uncertain || state.expired) && <a href={state.uncertain ? dayHref(draft.date) : "/login"} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold ">{state.uncertain ? "Conferir agenda em outra aba" : "Abrir login em outra aba"}</a>}</div>}
       <fieldset disabled={pending} className="grid min-w-0 gap-4 sm:grid-cols-2">
         <legend className="sr-only">Dados da atividade</legend>

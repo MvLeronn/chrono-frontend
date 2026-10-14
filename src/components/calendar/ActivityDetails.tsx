@@ -78,8 +78,8 @@ export function ActivityDetails({ item, children, className, statusOnly = false 
       const bounds = event.currentTarget.getBoundingClientRect();
       if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) close();
     }} className="activity-modal pointer-events-auto m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-lg overflow-y-auto overscroll-contain rounded-surface border border-border bg-surface p-0 text-left text-base font-normal text-text-primary shadow-xl backdrop:bg-text-primary/40">
-      <div className="space-y-5 p-4 sm:p-6">
-        <header className="sticky top-0 z-30 flex items-start justify-between gap-3 bg-surface py-3">
+      <div className="space-y-4 p-4">
+        <header className="sticky top-0 z-30 flex items-start justify-between gap-3 bg-surface">
           <div className="min-w-0">{!statusOnly && <p className="mb-1 text-xs font-semibold text-primary">{current.type === "TASK" ? "Tarefa" : "Evento"} · {recurring ? "Recorrência" : current.source === "EVENT" && current.templateApplicationId ? "Modelo semanal" : "Atividade avulsa"}</p>}<h2 id={titleId} className="wrap-anywhere text-xl font-semibold">{statusOnly ? "Alterar status" : editing ? "Editar informações" : current.title}</h2>{statusOnly && <p className="mt-1 wrap-anywhere text-sm text-text-secondary">{current.title}</p>}</div>
           <button type="button" onClick={close} disabled={pending} aria-label="Fechar detalhes" className="flex size-11 shrink-0 items-center justify-center rounded-control hover:bg-background disabled:opacity-50"><X aria-hidden="true" className="size-5" /></button>
         </header>

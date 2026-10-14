@@ -60,7 +60,7 @@ export function Input({
       onChange={onChange}
       aria-invalid={ariaInvalid}
       aria-describedby={ariaDescribedBy}
-      className={`block min-h-11 w-full min-w-0 rounded-control border border-text-secondary bg-surface px-3 py-2 text-base leading-6 text-text-primary placeholder:text-text-secondary aria-invalid:border-error disabled:cursor-not-allowed disabled:border-border disabled:bg-background disabled:text-text-secondary ${className}`}
+      className={`block min-h-11 w-full min-w-0 rounded-control border border-field bg-background/50 px-3 py-2 transition-[border-color,background-color] duration-150 focus:border-primary focus:bg-surface disabled:cursor-not-allowed disabled:bg-background disabled:text-text-secondary motion-reduce:transition-none text-base leading-6 text-text-primary placeholder:text-text-secondary aria-invalid:border-error disabled:cursor-not-allowed disabled:border-border disabled:bg-background disabled:text-text-secondary ${className}`}
     />
   );
 }

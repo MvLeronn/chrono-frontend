@@ -8,7 +8,7 @@ import { validateEvent } from "../../../lib/event-input";
 import type { EventDraft, EventFormState } from "./state";
 import type { CreateEventInput } from "../../../models/event";
 
-export async function createEventAction(_previous: EventFormState, formData: FormData): Promise<EventFormState> {
+export async function createEventAction(_previous: EventFormState, formData: FormData, inline = false): Promise<EventFormState> {
   const session = await getCurrentUser();
   if (!session.ok) {
     if (session.status === 401) return { expired: true, message: "Sua sessão expirou. Entre novamente em outra aba e retorne para salvar este formulário." };
@@ -35,5 +35,10 @@ export async function createEventAction(_previous: EventFormState, formData: For
     return { uncertain: true, message: "Não foi possível confirmar a criação. Confira a agenda em outra aba antes de enviar novamente: a atividade pode ter sido salva." };
   }
   revalidatePath("/");
-  redirect(`/atividades/${result.data.id}?created=1`);
+  if (inline) return { success: true };
+  redirect(`/?modal=EventDetails&id=${result.data.id}&created=1`);
+}
+
+export async function createCalendarEventAction(previous: EventFormState, formData: FormData): Promise<EventFormState> {
+  return createEventAction(previous, formData, true);
 }

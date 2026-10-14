@@ -40,8 +40,7 @@ export async function endRecurringAction(id: string, version: string, _previous:
   if (!result.ok) return failure(result, true);
   revalidatePath("/");
   revalidatePath("/recorrencias", "layout");
-  revalidatePath("/ocorrencias", "layout");
   const outcome = result.data.effectiveUntil === current.data.effectiveUntil ? "unchanged" : "1";
   if (returnToList) redirect(`/recorrencias?ended=${outcome}`);
-  redirect(`/recorrencias/${id}?ended=${outcome}`);
+  redirect(`/recorrencias?modal=RecurringDetails&id=${id}&ended=${outcome}`);
 }

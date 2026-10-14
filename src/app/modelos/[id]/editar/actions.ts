@@ -33,7 +33,5 @@ export async function updateTemplateAction(id: string, updatedAt: string, initia
   const result = await updateTemplate(id, input);
   if (!result.ok) return failure(result, true);
   revalidatePath("/modelos");
-  revalidatePath(`/modelos/${id}`);
-  revalidatePath(`/modelos/${id}/editar`);
-  redirect(`/modelos/${id}?updated=1`);
+  redirect(`/modelos?modal=TemplateDetails&id=${id}&updated=1`);
 }

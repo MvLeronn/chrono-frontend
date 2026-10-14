@@ -22,5 +22,5 @@ export async function createTemplateAction(_previous: TemplateFormState, formDat
     return { uncertain: true, message: "Não foi possível confirmar a criação. Confira os modelos em outra aba antes de reenviar: o modelo pode ter sido criado, e repetir pode duplicá-lo." };
   }
   revalidatePath("/modelos");
-  redirect(`/modelos/${result.data.id}?created=1`);
+  redirect(`/modelos?modal=TemplateDetails&id=${result.data.id}&created=1`);
 }

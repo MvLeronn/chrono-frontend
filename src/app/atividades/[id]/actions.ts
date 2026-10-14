@@ -20,7 +20,7 @@ function failure(result: ApiFailure, mutation = false): EventFormState {
     : { message: "Não foi possível consultar a atividade. Seu preenchimento foi mantido; tente novamente em instantes." };
 }
 
-export async function updateEventAction(id: string, initial: EventDraft, _previous: EventFormState, formData: FormData): Promise<EventFormState> {
+export async function updateEventAction(id: string, initial: EventDraft, _previous: EventFormState, formData: FormData, inline = false): Promise<EventFormState> {
   const session = await getCurrentUser();
   if (!session.ok) return failure(session);
   const draft = { ...initial };
@@ -49,13 +49,11 @@ export async function updateEventAction(id: string, initial: EventDraft, _previo
   const result = await updateEvent(id, input);
   if (!result.ok) return failure(result, true);
   revalidatePath("/");
-  revalidatePath(`/atividades/${id}`);
-  revalidatePath(`/atividades/${id}/editar`);
-  redirect(`/atividades/${id}?updated=1`);
+  if (inline) return { success: true };
+  redirect(`/?modal=EventDetails&id=${id}&updated=1`);
 }
 
-export async function deleteEventAction(id: string, _previous: EventFormState, formData: FormData): Promise<EventFormState> {
-  if (formData.get("confirm") !== "yes") return { message: "Confirme que deseja excluir esta atividade definitivamente." };
+export async function deleteEventAction(id: string): Promise<EventFormState> {
   const session = await getCurrentUser();
   if (!session.ok) return failure(session);
   const current = await getEvent(id);
@@ -63,7 +61,9 @@ export async function deleteEventAction(id: string, _previous: EventFormState, f
   const result = await deleteEvent(id);
   if (!result.ok) return failure(result, true);
   revalidatePath("/");
-  revalidatePath(`/atividades/${id}`);
-  revalidatePath(`/atividades/${id}/editar`);
   redirect(`${dayHref(current.data.date)}&deleted=1`);
+}
+
+export async function updateCalendarEventAction(id: string, initial: EventDraft, previous: EventFormState, formData: FormData): Promise<EventFormState> {
+  return updateEventAction(id, initial, previous, formData, true);
 }

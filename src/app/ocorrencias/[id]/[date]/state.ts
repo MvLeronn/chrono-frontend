@@ -6,6 +6,7 @@ export type OccurrenceModes = Record<OverrideField, OverrideMode>;
 export type OccurrenceDraft = EventDraft;
 
 export interface OccurrenceFormState {
+  success?: boolean;
   errors?: EventFormErrors;
   message?: string;
   expired?: boolean;

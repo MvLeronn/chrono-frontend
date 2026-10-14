@@ -24,14 +24,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       : undefined;
   return (
     <main className="flex min-h-dvh flex-col px-4 py-8 sm:px-6 sm:py-12">
-      <div className="mx-auto my-auto w-full max-w-100 space-y-8">
+      <div className="mx-auto my-auto w-full max-w-112 space-y-8">
         <div className="flex items-center justify-center gap-2 text-primary">
-          <Clock3 aria-hidden="true" className="size-6" />
+          <span className="flex size-11 items-center justify-center rounded-2xl bg-primary-soft"><Clock3 aria-hidden="true" className="size-6" /></span>
           <span className="text-xl font-semibold tracking-tight">Chrono</span>
         </div>
-        <section aria-labelledby="login-title" className="rounded-surface border border-border bg-surface p-4 sm:p-6">
-          <header className="mb-6 space-y-2">
-            <h1 id="login-title" className="text-2xl font-semibold leading-8">Seu tempo, organizado.</h1>
+        <section aria-labelledby="login-title" className="rounded-surface border border-border bg-surface p-6 sm:p-8">
+          <header className="mb-8 space-y-3">
+            <h1 id="login-title" className="text-2xl font-medium tracking-tight leading-8">Seu tempo, organizado.</h1>
             <p className="text-base leading-6 text-text-secondary">Entre para cuidar dos seus eventos e tarefas.</p>
           </header>
           <LoginForm notice={notice} />

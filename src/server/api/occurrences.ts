@@ -30,3 +30,10 @@ export function updateOccurrence(id: string, occurrenceDate: string, input: Upda
 export function resetOccurrence(id: string, occurrenceDate: string) {
   return requestOccurrence({ path: "occurrence-reset", id, occurrenceDate });
 }
+
+export async function deleteOccurrence(id: string, occurrenceDate: string): Promise<ApiResult<null>> {
+  const result = await requestApi({ path: "occurrence-delete", id, occurrenceDate });
+  if (!result.ok) return result;
+  if (result.status !== 204) return invalidResponse(result.status);
+  return { ok: true, status: 204, data: null };
+}

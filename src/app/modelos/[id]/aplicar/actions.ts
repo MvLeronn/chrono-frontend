@@ -19,16 +19,14 @@ function failure(result: ApiFailure, mutation = false): ApplyTemplateState {
 export async function applyTemplateAction(id: string, updatedAt: string, _previous: ApplyTemplateState, formData: FormData): Promise<ApplyTemplateState> {
   const weekStart = formData.get("weekStart");
   if (typeof weekStart !== "string" || !templateWeekEnd(weekStart)) return { dateError: "Escolha uma segunda-feira cuja semana completa termine até 31/12/9999." };
-  if (formData.get("confirm") !== "yes") return { message: "Confirme a aplicação na semana apresentada." };
   const session = await getCurrentUser();
   if (!session.ok) return failure(session);
   const current = await getTemplate(id);
   if (!current.ok) return failure(current);
-  if (current.data.updatedAt !== updatedAt) return { stale: true, message: "O modelo mudou desde a abertura. Consulte a versão atual e abra novamente a aplicação para revisar os itens antes de confirmar. Sua seleção foi mantida." };
+  if (current.data.updatedAt !== updatedAt) return { stale: true, message: "O modelo mudou desde a abertura. Consulte a versão atual e abra novamente a aplicação para revisar os itens antes de aplicar. Sua seleção foi mantida." };
   const result = await applyTemplate(id, weekStart);
   if (!result.ok) return failure(result, true);
   revalidatePath("/");
   revalidatePath("/modelos");
-  revalidatePath(`/modelos/${id}`);
   return { result: result.data };
 }

@@ -11,6 +11,7 @@ export interface EventDraft {
 export type EventFormErrors = Partial<Record<keyof EventDraft, string>>;
 
 export interface EventFormState {
+  success?: boolean;
   errors?: EventFormErrors;
   message?: string;
   uncertain?: boolean;

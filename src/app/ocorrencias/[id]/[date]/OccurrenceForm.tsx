@@ -1,5 +1,6 @@
 "use client";
 
+import { FormSurface } from "../../../../components/ui/FormSurface";
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState, type FormEvent } from "react";
 import { Button } from "../../../../components/ui/Button";
@@ -14,10 +15,12 @@ interface OccurrenceFormProps {
   originalDate: string;
   initial: OccurrenceDraft;
   hasState: boolean;
+  onCancel?: () => void;
+  onSuccess?: () => void;
   saveAction: (previous: OccurrenceFormState, formData: FormData) => Promise<OccurrenceFormState>;
 }
 
-const control = "min-h-11 w-full min-w-0 rounded-control border border-text-secondary bg-surface px-3 py-2 text-base aria-invalid:border-error disabled:bg-background disabled:text-text-secondary";
+const control = "min-h-11 w-full min-w-0 rounded-control border border-field bg-background/50 px-3 py-2 transition-[border-color,background-color] duration-150 focus:border-primary focus:bg-surface disabled:cursor-not-allowed disabled:bg-background disabled:text-text-secondary motion-reduce:transition-none text-base aria-invalid:border-error disabled:bg-background disabled:text-text-secondary";
 const groups: { key: OverrideField; label: string }[] = [
   { key: "title", label: "Título" },
   { key: "type", label: "Categoria" },
@@ -26,22 +29,22 @@ const groups: { key: OverrideField; label: string }[] = [
 ];
 const labels: Record<keyof OccurrenceDraft, string> = { title: "Título desta ocorrência", type: "Categoria desta ocorrência", description: "Descrição desta ocorrência", date: "Data planejada", startTime: "Início (opcional)", endTime: "Fim (opcional)", status: "Status" };
 
-export function OccurrenceForm({ id, originalDate, initial, hasState, saveAction }: OccurrenceFormProps) {
+export function OccurrenceForm({ id, originalDate, initial, hasState, saveAction, onCancel, onSuccess }: OccurrenceFormProps) {
   const [draft, setDraft] = useState(initial);
   const [modes, setModes] = useState<OccurrenceModes>({ title: "keep", type: "keep", description: "keep", time: "keep" });
   const [state, action, pending] = useActionState(saveAction, {} as OccurrenceFormState);
   const [localErrors, setLocalErrors] = useState<OccurrenceFormState["errors"]>();
   const [intent, setIntent] = useState("save");
-  const [confirmed, setConfirmed] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const submitted = useRef(false);
   const errors = localErrors ?? state.errors;
   useEffect(() => {
     if (pending) return;
     submitted.current = false;
+    if (state.success) { onSuccess?.(); return; }
     if (state.errors) root.current?.querySelector<HTMLElement>("[aria-invalid=true]")?.focus();
     else if (state.message) root.current?.querySelector<HTMLElement>("[role=alert]")?.focus();
-  }, [pending, state]);
+  }, [pending, state, onSuccess]);
 
   function submit(event: FormEvent<HTMLFormElement>, nextIntent: "save" | "reset") {
     if (pending || submitted.current) { event.preventDefault(); return; }
@@ -69,8 +72,8 @@ export function OccurrenceForm({ id, originalDate, initial, hasState, saveAction
   }
 
   return <div ref={root} className="space-y-6">
-    {state.message && <div role="alert" tabIndex={-1} className="space-y-2 rounded-control bg-error-soft p-3 text-sm text-error"><p>{state.message}</p>{(state.expired || state.uncertain) && <a href={state.expired ? "/login" : occurrenceHref(id, originalDate)} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold underline">{state.expired ? "Abrir login em outra aba" : "Conferir ocorrência em outra aba"}</a>}<Link href="/" className="inline-flex min-h-11 items-center font-semibold underline">Voltar ao calendário</Link></div>}
-    <form action={action} onSubmit={(event) => submit(event, "save")} noValidate className="space-y-6 rounded-surface border border-border bg-surface p-4 sm:p-6">
+    {state.message && <div role="alert" tabIndex={-1} className="space-y-2 rounded-control bg-error-soft p-3 text-sm text-error"><p>{state.message}</p>{(state.expired || state.uncertain) && <a href={state.expired ? "/login" : occurrenceHref(id, originalDate)} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold ">{state.expired ? "Abrir login em outra aba" : "Conferir ocorrência em outra aba"}</a>}<Link href="/" className="inline-flex min-h-11 items-center font-semibold ">Voltar ao calendário</Link></div>}
+    <FormSurface action={action} onSubmit={(event) => submit(event, "save")} noValidate embedded={Boolean(onCancel)} className="space-y-6">
       <input type="hidden" name="intent" value="save" />
       <fieldset disabled={pending} className="min-w-0 space-y-6">
         <legend className="sr-only">Editar somente esta ocorrência</legend>
@@ -90,17 +93,16 @@ export function OccurrenceForm({ id, originalDate, initial, hasState, saveAction
           {key === "time" && modes[key] === "custom" && <p className="text-sm text-text-secondary">Deixe ambos vazios para remover os horários somente desta ocorrência. Você também pode informar apenas o início.</p>}
         </section>)}
       </fieldset>
-      <div className="flex flex-wrap items-center gap-4"><Button type="submit" disabled={pending} loading={pending && intent === "save"} loadingLabel="Salvando…">Salvar ocorrência</Button>{!pending && <Link href={dayHref(initial.date)} className="inline-flex min-h-11 items-center text-sm font-semibold text-primary underline">Voltar ao calendário</Link>}</div>
-    </form>
-    {hasState && <details className="border-t border-border pt-3">
-      <summary className="w-fit cursor-pointer rounded-control py-3 text-sm font-semibold text-error">Restaurar ocorrência</summary>
-      <form action={action} onSubmit={(event) => submit(event, "reset")} className="mt-2 space-y-4 rounded-surface border border-border bg-surface p-4 sm:p-6">
+      <div className="flex flex-wrap justify-end items-center gap-4">{!pending && (onCancel ? <Button variant="secondary" onClick={onCancel}>Cancelar</Button> : <Link href={dayHref(initial.date)} className="inline-flex min-h-11 items-center text-sm font-semibold text-primary ">Voltar ao calendário</Link>)}<Button type="submit" disabled={pending} loading={pending && intent === "save"} loadingLabel="Salvando…">Salvar ocorrência</Button></div>
+    </FormSurface>
+    {hasState && <section className="border-t border-border pt-3">
+      <FormSurface embedded={false} action={action} onSubmit={(event) => submit(event, "reset")} className="mt-2 space-y-4">
         <input type="hidden" name="intent" value="reset" />
-        <h2 className="font-semibold">Restaurar todos os valores desta ocorrência?</h2>
+        <h2 className="font-semibold">Restaurar ocorrência</h2>
         <p className="text-sm text-text-secondary">Serão removidas todas as personalizações, o reagendamento, o status e a conclusão. A ocorrência voltará à data original, ficará Pendente e herdará os valores da recorrência. Ela continuará no calendário; as demais ocorrências não serão alteradas. Alterações não salvas neste formulário também serão descartadas.</p>
-        <fieldset disabled={pending} className="space-y-4"><legend className="sr-only">Confirmação de restauração</legend><label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm"><input type="checkbox" name="confirm" value="yes" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} required className="size-5 shrink-0 accent-primary" />Confirmo a restauração completa desta ocorrência.</label><Button type="submit" variant="danger" disabled={pending} loading={pending && intent === "reset"} loadingLabel="Restaurando…">Restaurar ocorrência</Button></fieldset>
-      </form>
-    </details>}
+        <fieldset disabled={pending} className="flex justify-end"><legend className="sr-only">Restaurar ocorrência</legend><Button type="submit" variant="danger" disabled={pending} loading={pending && intent === "reset"} loadingLabel="Restaurando…">Restaurar ocorrência</Button></fieldset>
+      </FormSurface>
+    </section>}
     <p role="status" className="sr-only">{pending ? intent === "reset" ? "Restaurando ocorrência…" : "Salvando ocorrência…" : ""}</p>
   </div>;
 }

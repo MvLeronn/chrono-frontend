@@ -1,5 +1,6 @@
 "use client";
 
+import { FormSurface } from "../../../components/ui/FormSurface";
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState, type FormEvent, type ChangeEvent } from "react";
 import { Button } from "../../../components/ui/Button";
@@ -20,7 +21,7 @@ interface RecurringFormProps {
   onCancel?: () => void;
 }
 
-const control = "min-h-11 w-full min-w-0 rounded-control border border-text-secondary bg-surface px-3 py-2 text-sm aria-invalid:border-error";
+const control = "min-h-11 w-full min-w-0 rounded-control border border-field bg-background/50 px-3 py-2 transition-[border-color,background-color] duration-150 focus:border-primary focus:bg-surface disabled:cursor-not-allowed disabled:bg-background disabled:text-text-secondary motion-reduce:transition-none text-base sm:text-sm aria-invalid:border-error";
 const labels: Record<keyof RecurringDraft, string> = { title: "Título", type: "Categoria", description: "Descrição (opcional)", startDate: "Data de referência", startTime: "Início", endTime: "Fim", frequency: "Frequência", interval: "Repetir a cada", termination: "Término", until: "Até", count: "Ocorrências" };
 
 export function RecurringForm({ date, initialDraft, splitFrom, saveAction, onCancel }: RecurringFormProps) {
@@ -53,7 +54,7 @@ export function RecurringForm({ date, initialDraft, splitFrom, saveAction, onCan
     const numeric = key === "interval" || key === "count";
     const dateField = key === "startDate" || key === "until";
     const common = { id: `recurring-${key}`, name: key, value: draft[key], onChange: (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => { setDraft({ ...draft, [key]: event.target.value }); setLocalErrors(undefined); }, "aria-invalid": Boolean(errors?.[key]) || undefined, "aria-describedby": errors?.[key] ? `error-${key}` : undefined, className: control };
-    return <div key={key} className={`min-w-0 space-y-1 ${wide ? "col-span-2" : ""}`}>
+    return <div key={key} className={`min-w-0 space-y-1 ${wide ? "sm:col-span-2" : ""}`}>
       <Label htmlFor={`recurring-${key}`}>{labels[key]}</Label>
       {options ? <select {...common}>{options.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
         : key === "description" ? <textarea {...common} rows={2} maxLength={10000} className={`${control} resize-y`} />
@@ -61,16 +62,16 @@ export function RecurringForm({ date, initialDraft, splitFrom, saveAction, onCan
       {errors?.[key] && <FieldError id={`error-${key}`} role="alert">{errors[key]}</FieldError>}
     </div>;
   }
-  return <form ref={form} action={action} onSubmit={submit} noValidate className={`space-y-3 ${onCancel ? "" : "rounded-surface border border-border bg-surface p-4"}`}>
+  return <FormSurface ref={form} action={action} onSubmit={submit} noValidate embedded={Boolean(onCancel)} compact className="space-y-3">
     <div className="flex items-center justify-between gap-2"><p className="text-xs text-text-secondary">{splitFrom ? `A partir de ${formatCalendarDate(splitFrom, { day: "2-digit", month: "2-digit", year: "numeric" })}` : "Nova recorrência"}</p><InfoDisclosure label="Informações sobre a recorrência"><p>Altere os campos e salve. Somente os valores modificados serão enviados.</p><p>Na edição pela lista, somente datas após hoje serão alteradas; hoje e as anteriores serão preservadas. Pelo calendário, vale a ocorrência escolhida. A data indicada é a original, mesmo após reagendamento.</p><p>A referência define o padrão da repetição. Alterar frequência ou intervalo inicia um novo padrão a partir da ocorrência escolhida, salvo se você alterar a referência.</p><p>O término e a contagem são preservados quando você não os altera. A contagem inclui a primeira ocorrência e parte da referência original. Quando a referência muda, o serviço ajusta a quantidade restante.</p><p>Deixe os horários vazios para uma atividade sem horário. Datas inexistentes usam o último dia válido do mês, preservando a referência original.</p><p>Personalizações compatíveis e o conteúdo de ocorrências concluídas são preservados. Mudanças incompatíveis com dados salvos são recusadas; nenhum dado é apagado automaticamente.</p></InfoDisclosure></div>
-    {state.message && <div role="alert" tabIndex={-1} className="space-y-2 rounded-control bg-error-soft p-3 text-sm text-error"><p>{state.message}</p>{state.conflicts?.length ? <p>{state.conflicts.map((item) => formatCalendarDate(item.occurrenceDate, { day: "2-digit", month: "2-digit", year: "numeric" })).join(", ")}</p> : null}{(state.expired || state.uncertain) && <a href={state.expired ? "/login" : "/recorrencias"} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold underline">{state.expired ? "Entrar novamente" : "Conferir recorrências"}</a>}</div>}
-    <fieldset disabled={pending} className="grid min-w-0 grid-cols-2 gap-3"><legend className="sr-only">Dados da recorrência</legend>
+    {state.message && <div role="alert" tabIndex={-1} className="space-y-2 rounded-control bg-error-soft p-3 text-sm text-error"><p>{state.message}</p>{state.conflicts?.length ? <p>{state.conflicts.map((item) => formatCalendarDate(item.occurrenceDate, { day: "2-digit", month: "2-digit", year: "numeric" })).join(", ")}</p> : null}{(state.expired || state.uncertain) && <a href={state.expired ? "/login" : "/recorrencias"} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold ">{state.expired ? "Entrar novamente" : "Conferir recorrências"}</a>}</div>}
+    <fieldset disabled={pending} className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2"><legend className="sr-only">Dados da recorrência</legend>
       {field("title", true)}
-      <div className="col-span-2 grid grid-cols-2 items-end gap-3 sm:grid-cols-3">{field("type")}{field("frequency")}{field("interval")}</div>
-      <div className={`col-span-2 grid grid-cols-2 items-end gap-3 ${draft.termination === "none" ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>{field("startDate")}{field("termination")}{draft.termination === "until" && field("until")}{draft.termination === "count" && field("count")}</div>
+      <div className="grid grid-cols-1 items-end gap-4 sm:col-span-2 sm:grid-cols-3">{field("type")}{field("frequency")}{field("interval")}</div>
+      <div className={`grid grid-cols-1 items-end gap-4 sm:col-span-2 ${draft.termination === "none" ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>{field("startDate")}{field("termination")}{draft.termination === "until" && field("until")}{draft.termination === "count" && field("count")}</div>
       {field("startTime")}{field("endTime")}{field("description", true)}
       {draft.termination !== "until" && <input type="hidden" name="until" value={draft.until} />}{draft.termination !== "count" && <input type="hidden" name="count" value={draft.count} />}
     </fieldset>
-    <div className="sticky bottom-0 flex flex-wrap items-center gap-2 border-t border-border bg-surface pt-3 pb-1"><Button type="submit" loading={pending} loadingLabel={split ? "Salvando…" : "Criando…"}>{split ? "Salvar alterações" : "Criar recorrência"}</Button>{!pending && (onCancel ? <Button onClick={onCancel} variant="secondary">Cancelar</Button> : <Link href="/recorrencias" className="inline-flex min-h-11 items-center px-3 text-sm font-semibold text-primary">Cancelar</Link>)}</div><p role="status" className="sr-only">{pending ? "Salvando recorrência…" : ""}</p>
-  </form>;
+    <div className="sticky bottom-0 flex flex-wrap justify-end items-center gap-2 border-t border-border bg-surface pt-3 pb-1">{!pending && (onCancel ? <Button onClick={onCancel} variant="secondary">Cancelar</Button> : <Link href="/recorrencias" className="inline-flex min-h-11 items-center px-3 text-sm font-semibold text-primary">Cancelar</Link>)}<Button type="submit" loading={pending} loadingLabel={split ? "Salvando…" : "Criando…"}>{split ? "Salvar alterações" : "Criar recorrência"}</Button></div><p role="status" className="sr-only">{pending ? "Salvando recorrência…" : ""}</p>
+  </FormSurface>;
 }

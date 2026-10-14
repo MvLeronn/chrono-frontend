@@ -4,7 +4,7 @@ import type { UpdateOccurrenceInput } from "../models/occurrence";
 import type { OccurrenceDraft, OccurrenceModes } from "../app/ocorrencias/[id]/[date]/state";
 
 export function occurrenceHref(id: string, date: string): string {
-  return `/ocorrencias/${encodeURIComponent(id)}/${encodeURIComponent(date)}`;
+  return `/?modal=Occurrence&id=${encodeURIComponent(id)}&date=${encodeURIComponent(date)}`;
 }
 
 export function occurrenceDraft(item: ResolvedOccurrence): OccurrenceDraft {

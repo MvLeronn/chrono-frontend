@@ -18,10 +18,9 @@ function failure(result: ApiFailure, mutation = false): OccurrenceFormState {
     : { message: "Não foi possível consultar a ocorrência. Seu preenchimento foi mantido; tente novamente em instantes." };
 }
 
-export async function saveOccurrenceAction(id: string, date: string, initial: OccurrenceDraft, _previous: OccurrenceFormState, formData: FormData): Promise<OccurrenceFormState> {
+export async function saveOccurrenceAction(id: string, date: string, initial: OccurrenceDraft, _previous: OccurrenceFormState, formData: FormData, inline = false): Promise<OccurrenceFormState> {
   const intent = formData.get("intent");
   if (intent !== "save" && intent !== "reset") return { message: "Escolha uma ação válida." };
-  if (intent === "reset" && formData.get("confirm") !== "yes") return { message: "Confirme a restauração completa antes de continuar." };
   const session = await getCurrentUser();
   if (!session.ok) return failure(session);
   const current = await getOccurrence(id, date);
@@ -52,7 +51,11 @@ export async function saveOccurrenceAction(id: string, date: string, initial: Oc
   if (!result.ok) return failure(result, true);
   const href = occurrenceHref(id, date);
   revalidatePath("/");
-  revalidatePath(href);
+  if (inline) return { success: true };
   // A successful save may only change inheritance, leaving resolved values identical.
-  redirect(`${href}?${intent === "reset" ? "restored" : "saved"}=1&revision=${crypto.randomUUID()}`);
+  redirect(`${href}&${intent === "reset" ? "restored" : "saved"}=1&revision=${crypto.randomUUID()}`);
+}
+
+export async function updateCalendarOccurrenceAction(id: string, date: string, initial: OccurrenceDraft, previous: OccurrenceFormState, formData: FormData): Promise<OccurrenceFormState> {
+  return saveOccurrenceAction(id, date, initial, previous, formData, true);
 }

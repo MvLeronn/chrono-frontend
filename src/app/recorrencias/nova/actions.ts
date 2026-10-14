@@ -36,5 +36,5 @@ export async function createRecurringAction(_previous: RecurringFormState, formD
   }
   revalidatePath("/");
   revalidatePath("/recorrencias");
-  redirect(`/recorrencias/${result.data.id}?created=1`);
+  redirect(`/recorrencias?modal=RecurringDetails&id=${result.data.id}&created=1`);
 }

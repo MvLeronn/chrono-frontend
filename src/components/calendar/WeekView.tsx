@@ -1,10 +1,13 @@
+import { ActivityDetails } from "./ActivityDetails";
+import { HoursToggle } from "./HoursToggle";
 import Link from "next/link";
 import { newEventHref } from "../../lib/event-input";
 import { redirect } from "next/navigation";
 import { getCalendar } from "../../server/api/calendar";
-import { adjacentDate, calendarHref, dayHref, formatCalendarDate, rangeLength, weekHref, weekRange } from "../../lib/calendar-date";
+import { adjacentDate, dayHref, formatCalendarDate, rangeLength, weekHref, weekRange } from "../../lib/calendar-date";
 import { layoutDayActivities } from "../../lib/day-layout";
-import { ActivityRow, activityStatuses } from "./ActivityRow";
+import { ActivityRow } from "./ActivityRow";
+import { activityStatuses } from "./activity-status";
 import { TimedActivityBlocks } from "./TimedActivityBlocks";
 
 interface WeekViewProps {
@@ -26,7 +29,7 @@ export async function WeekView({ date, today, fullHours }: WeekViewProps) {
       <div className="space-y-3 px-4 py-12 sm:px-6">
         <h2 className="text-lg font-semibold">Não foi possível carregar a semana</h2>
         <p role="alert" className="text-sm text-text-secondary">{result.code === "TIMEOUT" ? "O serviço demorou para responder." : result.code === "INVALID_RESPONSE" ? "O serviço retornou uma resposta inesperada." : "O serviço está indisponível no momento."} Tente novamente para consultar as atividades.</p>
-        <a href={weekHref(date)} className="inline-flex min-h-11 items-center rounded-control font-semibold text-primary underline underline-offset-4">Tentar novamente</a>
+        <a href={weekHref(date)} className="inline-flex min-h-11 items-center rounded-control font-semibold text-primary  ">Tentar novamente</a>
       </div>
     );
   }
@@ -40,10 +43,8 @@ export async function WeekView({ date, today, fullHours }: WeekViewProps) {
   return (
     <>
       <div className="px-4 py-2">
-        <div className="flex flex-wrap gap-x-4 gap-y-2">
-          <Link href={dayHref(date)} prefetch={false} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">Abrir dia selecionado</Link>
-          <Link href={calendarHref(range)} prefetch={false} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">Abrir semana na agenda</Link>
-          <a href="#week-details" className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">Ir para a lista da semana</a>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <div className="ml-auto order-last"><HoursToggle full={fullHours} /></div>
         </div>
         {result.data.items.length === 0 && <p className="text-sm text-text-secondary">Nenhuma atividade nesta semana. Escolha outro período para continuar.</p>}
         {days.length < 7 && <p className="text-xs text-text-secondary">Exibindo os dias disponíveis até 31 de dezembro de 9999.</p>}
@@ -60,7 +61,7 @@ export async function WeekView({ date, today, fullHours }: WeekViewProps) {
           </div>)}
           <div className="sticky left-0 z-10 border-b border-border bg-surface px-1 py-3 text-center text-xs font-semibold text-text-secondary">Sem horário</div>
           {days.map((day) => <div key={`untimed-${day.date}`} className="border-b border-l border-border p-2">
-            {day.untimed.length ? <ul className="space-y-2">{day.untimed.map((item, index) => <li key={item.calendarKey}><a href={`#week-${day.date}-untimed-${index}`} className={`block min-h-11 rounded-control p-2 text-xs ${activityStatuses[item.status].className}`}><p className="truncate font-semibold">{item.title}</p></a></li>)}</ul> : <p className="py-2 text-xs text-text-secondary">—</p>}
+            {day.untimed.length ? <ul className="space-y-2">{day.untimed.map((item) => <li key={item.calendarKey}><ActivityDetails item={item} className={`block min-h-11 w-full rounded-control p-2 text-left text-xs ${activityStatuses[item.status].className} transition-[filter,box-shadow] hover:brightness-95 hover:shadow-sm hover:ring-1 hover:ring-current motion-reduce:transition-none`}><span className="block truncate font-semibold">{item.title}</span></ActivityDetails></li>)}</ul> : <p className="py-2 text-xs text-text-secondary">—</p>}
           </div>)}
           <div aria-hidden="true" className="sticky left-0 z-10 bg-surface" style={{ height: gridHeight }}>
             {[...hours, endHour].map((hour) => <span key={hour} className="absolute right-0 left-0 border-t border-border px-2 py-1 text-xs tabular-nums text-text-secondary" style={{ top: (hour - startHour) * 60 }}>{String(hour).padStart(2, "0")}:00</span>)}
@@ -76,12 +77,10 @@ export async function WeekView({ date, today, fullHours }: WeekViewProps) {
       <section id="week-details" tabIndex={-1} aria-labelledby="week-details-title" className="scroll-mt-4 px-4 py-6 sm:px-6">
         <h2 id="week-details-title" className="text-lg font-semibold">Atividades da semana</h2>
         {days.filter((day) => day.untimed.length + day.activities.length > 0).map((day) => <section key={day.date} aria-labelledby={`week-detail-${day.date}`} className="mt-2 border-t border-border pt-2">
-          <div className="flex flex-wrap items-center justify-between gap-2"><h3 id={`week-detail-${day.date}`} className="font-semibold"><time dateTime={day.date}>{formatCalendarDate(day.date, { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</time></h3><Link href={dayHref(day.date)} prefetch={false} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">Abrir dia</Link></div>
-          {day.untimed.length + day.activities.length ? <ul>{day.untimed.map((item, index) => <ActivityRow key={item.calendarKey} item={item} id={`week-${day.date}-untimed-${index}`} />)}{day.activities.map(({ item }, index) => <ActivityRow key={item.calendarKey} item={item} id={`week-${day.date}-timed-${index}`} />)}</ul> : <p className="mt-2 text-sm text-text-secondary">Nenhuma atividade neste dia.</p>}
+          <div className="flex flex-wrap items-center justify-between gap-2"><h3 id={`week-detail-${day.date}`} className="font-semibold"><time dateTime={day.date}>{formatCalendarDate(day.date, { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</time></h3></div>
+          {day.untimed.length + day.activities.length ? <ul className="mt-3 grid grid-cols-[repeat(auto-fill,minmax(min(100%,16rem),19rem))] gap-3">{day.untimed.map((item, index) => <ActivityRow key={item.calendarKey} item={item} id={`week-${day.date}-untimed-${index}`} />)}{day.activities.map(({ item }, index) => <ActivityRow key={item.calendarKey} item={item} id={`week-${day.date}-timed-${index}`} />)}</ul> : <p className="mt-2 text-sm text-text-secondary">Nenhuma atividade neste dia.</p>}
         </section>)}
-        <a href="#week-grid" className="mt-4 inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">Voltar à grade semanal</a>
       </section>
-      <p className="border-t border-border px-4 py-3 text-xs text-text-secondary sm:px-6">Fuso do planejamento: <span className="break-all">{result.data.timezone}</span></p>
     </>
   );
 }

@@ -21,5 +21,5 @@ export function validateEvent(draft: EventDraft): EventFormErrors {
 }
 
 export function newEventHref(date: string, time?: string): string {
-  return `/atividades/nova?date=${date}${time ? `&time=${encodeURIComponent(time)}` : ""}`;
+  return `/?modal=NewEvent&date=${date}${time ? `&time=${encodeURIComponent(time)}` : ""}`;
 }

@@ -49,7 +49,7 @@ export async function requestApi(request: ApiRequest): Promise<ApiResult<unknown
     }
     if (request.path === "recurring-list") url.searchParams.set("status", request.status);
     const response = await fetch(url, {
-      method: request.path === "event-update" || request.path === "occurrence-update" || request.path === "template-update" ? "PATCH" : request.path === "event-delete" || request.path === "occurrence-reset" || request.path === "template-archive" ? "DELETE" : body ? "POST" : "GET",
+      method: request.path === "event-update" || request.path === "occurrence-update" || request.path === "template-update" ? "PATCH" : request.path === "occurrence-delete" || request.path === "event-delete" || request.path === "occurrence-reset" || request.path === "template-archive" ? "DELETE" : body ? "POST" : "GET",
       headers,
       body: body ? JSON.stringify(body) : undefined,
       cache: "no-store",

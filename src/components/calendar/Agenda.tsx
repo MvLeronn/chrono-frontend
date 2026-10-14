@@ -19,11 +19,11 @@ export async function Agenda({ range, today }: AgendaProps) {
       <div className="space-y-3 px-4 py-12 sm:px-6">
         <h2 className="text-lg font-semibold">Não foi possível carregar a agenda</h2>
         <p role="alert" className="text-sm text-text-secondary">{result.code === "TIMEOUT" ? "O serviço demorou para responder." : result.code === "INVALID_RESPONSE" ? "O serviço retornou uma resposta inesperada." : "O serviço está indisponível no momento."} Tente novamente para consultar este período.</p>
-        <a href={calendarHref(range)} className="inline-flex min-h-11 items-center rounded-control font-semibold text-primary underline underline-offset-4">Tentar novamente</a>
+        <a href={calendarHref(range)} className="inline-flex min-h-11 items-center rounded-control font-semibold text-primary  ">Tentar novamente</a>
       </div>
     );
   }
-  const { items, timezone } = result.data;
+  const { items } = result.data;
   const groups = new Map<string, CalendarItem[]>();
   for (const item of items) {
     const group = groups.get(item.date);
@@ -45,12 +45,11 @@ export async function Agenda({ range, today }: AgendaProps) {
                 <span aria-hidden="true" className={`flex size-8 shrink-0 items-center justify-center text-lg font-semibold tabular-nums ${date === today ? "rounded-full bg-primary text-text-on-primary" : "rounded-control bg-background text-text-primary"}`}>{date.slice(8)}</span>
                 <h2 id={`day-${date}`} className="text-sm font-semibold"><time dateTime={date}>{formatCalendarDate(date, { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</time>{date === today && <span className="ml-2 text-primary">Hoje</span>}</h2>
               </div>
-              <ul>{activities.map((item) => <ActivityRow key={item.calendarKey} item={item} />)}</ul>
+              <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,16rem),19rem))] gap-3">{activities.map((item) => <ActivityRow key={item.calendarKey} item={item} />)}</ul>
             </section>
           ))}
         </div>
       )}
-      <p className="border-t border-border px-4 py-3 text-xs text-text-secondary sm:px-6">Fuso do planejamento: <span className="break-all">{timezone}</span></p>
     </>
   );
 }

@@ -1,18 +1,19 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { adjacentDate, adjacentMonth, adjacentWeek, dayHref, formatCalendarDate, monthHref, weekHref, weekRange } from "../../lib/calendar-date";
-import { Button } from "../ui/Button";
-import { Label } from "../ui/Label";
+import { CalendarDatePicker } from "./CalendarDatePicker";
 
 interface CalendarDateToolbarProps {
+  children?: ReactNode;
   date: string;
   today: string;
   view: "month" | "day" | "week";
 }
 
-const linkClass = "inline-flex min-h-11 min-w-11 items-center justify-center rounded-control border border-text-secondary px-3 text-sm font-semibold hover:bg-background";
+const linkClass = "inline-flex min-h-11 min-w-11 items-center justify-center rounded-control px-3 text-sm font-semibold hover:bg-background";
 
-export function CalendarDateToolbar({ date, today, view }: CalendarDateToolbarProps) {
+export function CalendarDateToolbar({ date, today, view, children }: CalendarDateToolbarProps) {
   const isMonth = view === "month";
   const isWeek = view === "week";
   const shift = isMonth ? adjacentMonth : isWeek ? adjacentWeek : adjacentDate;
@@ -23,24 +24,15 @@ export function CalendarDateToolbar({ date, today, view }: CalendarDateToolbarPr
   const nextLabel = isMonth ? "Próximo mês" : isWeek ? "Próxima semana" : "Próximo dia";
   const range = isWeek ? weekRange(date) : null;
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <h2 className="text-base font-semibold">{range ? `${formatCalendarDate(range.from, { day: "numeric", month: "short", year: "numeric" })} a ${formatCalendarDate(range.to, { day: "numeric", month: "short", year: "numeric" })}` : formatCalendarDate(date, isMonth ? { month: "long", year: "numeric" } : { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</h2>
-        {!isMonth && !isWeek && date === today && <p className="text-sm font-semibold text-primary">Hoje</p>}
-        <div className="flex gap-2" role="group" aria-label={isMonth ? "Navegar entre meses" : isWeek ? "Navegar entre semanas" : "Navegar entre dias"}>
+    <div className="flex flex-wrap items-center gap-2 p-3 md:gap-x-3 md:px-4">
+        <h2 className="mr-auto min-w-0 basis-full text-lg md:basis-auto md:text-xl font-medium first-letter:uppercase">{range ? `${formatCalendarDate(range.from, { day: "numeric", month: "short", year: "numeric" })} a ${formatCalendarDate(range.to, { day: "numeric", month: "short", year: "numeric" })}` : formatCalendarDate(date, isMonth ? { month: "long", year: "numeric" } : { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</h2>
+        <div className="flex shrink-0 gap-0.5" role="group" aria-label={isMonth ? "Navegar entre meses" : isWeek ? "Navegar entre semanas" : "Navegar entre dias"}>
+          <Link href={href(today)} prefetch={false} className="mr-2 inline-flex min-h-11 items-center rounded-full border border-border px-5 text-sm font-medium hover:bg-background">Hoje</Link>
           {previous ? <Link href={href(previous)} prefetch={false} aria-label={previousLabel} className={linkClass}><ChevronLeft aria-hidden="true" className="size-4" /></Link> : <button disabled aria-label={previousLabel} className="size-11 text-text-secondary"><ChevronLeft aria-hidden="true" className="mx-auto size-4" /></button>}
-          <Link href={href(today)} prefetch={false} className={linkClass}>Hoje</Link>
           {next ? <Link href={href(next)} prefetch={false} aria-label={nextLabel} className={linkClass}><ChevronRight aria-hidden="true" className="size-4" /></Link> : <button disabled aria-label={nextLabel} className="size-11 text-text-secondary"><ChevronRight aria-hidden="true" className="mx-auto size-4" /></button>}
         </div>
-      </div>
-      <form action="/" key={date} className="flex min-w-0 max-w-full flex-wrap items-center gap-2">
-        <input type="hidden" name="view" value={view} />
-        <Label className="sr-only" htmlFor="calendar-date">Ir para uma data</Label>
-        <div className="flex flex-wrap gap-2">
-          <input id="calendar-date" name="date" type="date" required min="0001-01-01" max="9999-12-31" defaultValue={date} className="min-h-11 min-w-0 max-w-full flex-1 rounded-control border border-text-secondary bg-surface px-3 py-2 text-base tabular-nums" />
-          <Button type="submit" variant="secondary">Ir</Button>
-        </div>
-      </form>
+      <CalendarDatePicker date={date} view={view} />
+      {children}
     </div>
   );
 }

@@ -41,7 +41,7 @@ export type ApiRequest = {
   path: "event-delete";
   id: string;
 } | {
-  path: "occurrence-detail" | "occurrence-reset";
+  path: "occurrence-detail" | "occurrence-reset" | "occurrence-delete";
   id: string;
   occurrenceDate: string;
 } | {

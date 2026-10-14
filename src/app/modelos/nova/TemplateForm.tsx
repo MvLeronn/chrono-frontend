@@ -1,5 +1,6 @@
 "use client";
 
+import { FormSurface } from "../../../components/ui/FormSurface";
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
@@ -10,7 +11,7 @@ import { validateTemplate, weekdays } from "../../../lib/template-input";
 import { createTemplateAction } from "./actions";
 import type { TemplateDraft, TemplateItemDraft, TemplateFormState } from "./state";
 
-const control = "min-h-11 w-full min-w-0 rounded-control border border-text-secondary bg-surface px-3 py-2 text-base aria-invalid:border-error disabled:bg-background disabled:text-text-secondary";
+const control = "min-h-11 w-full min-w-0 rounded-control border border-field bg-background/50 px-3 py-2 transition-[border-color,background-color] duration-150 focus:border-primary focus:bg-surface disabled:cursor-not-allowed disabled:bg-background disabled:text-text-secondary motion-reduce:transition-none text-base aria-invalid:border-error disabled:bg-background disabled:text-text-secondary";
 const labels = { weekday: "Dia da semana", type: "Categoria", title: "Título", description: "Descrição (opcional)", startTime: "Início (opcional)", endTime: "Fim (opcional)" };
 
 interface TemplateFormProps {
@@ -86,8 +87,8 @@ export function TemplateForm({ initialDraft, saveAction, detailHref = "/modelos"
     </div>;
   }
 
-  return <form ref={form} action={action} onSubmit={submit} noValidate className="space-y-6 rounded-surface border border-border bg-surface p-4 sm:p-6">
-    {state.message && <div role="alert" tabIndex={-1} className="space-y-2 rounded-control bg-error-soft p-3 text-sm text-error"><p>{state.message}</p>{(state.expired || state.uncertain || state.stale) && <a href={state.expired ? "/login" : detailHref} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold underline">{state.expired ? "Abrir login em outra aba" : editing ? "Conferir modelo em outra aba" : "Conferir modelos em outra aba"}</a>}</div>}
+  return <FormSurface ref={form} action={action} onSubmit={submit} noValidate className="space-y-6">
+    {state.message && <div role="alert" tabIndex={-1} className="space-y-2 rounded-control bg-error-soft p-3 text-sm text-error"><p>{state.message}</p>{(state.expired || state.uncertain || state.stale) && <a href={state.expired ? "/login" : detailHref} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold ">{state.expired ? "Abrir login em outra aba" : editing ? "Conferir modelo em outra aba" : "Conferir modelos em outra aba"}</a>}</div>}
     <fieldset disabled={pending} className="min-w-0 space-y-6">
       <legend className="sr-only">Definição do modelo semanal</legend>
       <div className="space-y-2"><Label htmlFor="name">Nome do modelo</Label><input id="name" name="name" required maxLength={100} value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} aria-invalid={Boolean(errors?.name) || undefined} aria-describedby={errors?.name ? "name-error" : undefined} className={control} />{errors?.name && <FieldError id="name-error">{errors.name}</FieldError>}</div>
@@ -99,9 +100,9 @@ export function TemplateForm({ initialDraft, saveAction, detailHref = "/modelos"
         {field(item, "title")}{field(item, "weekday")}{field(item, "type")}{field(item, "startTime")}{field(item, "endTime")}{field(item, "description")}
         <div className="sm:col-span-2"><Button variant="secondary" onClick={() => removeItem(item.key)}>Remover item {index + 1}</Button></div>
       </fieldset>)}</div>
-      <button id="add-item" type="button" disabled={draft.items.length >= 200} onClick={addItem} className="inline-flex min-h-11 items-center rounded-control border border-text-secondary px-4 py-2 text-sm font-semibold text-primary enabled:hover:bg-background disabled:text-text-secondary">Adicionar item</button>
+      <button id="add-item" type="button" disabled={draft.items.length >= 200} onClick={addItem} className="inline-flex min-h-11 items-center rounded-control border border-field px-4 py-2 text-sm font-semibold text-primary enabled:hover:bg-background disabled:text-text-secondary">Adicionar item</button>
     </fieldset>
-    <div className="flex flex-wrap items-center gap-4 border-t border-border pt-5"><Button type="submit" loading={pending} loadingLabel={editing ? "Salvando…" : "Criando…"}>{editing ? "Salvar alterações" : "Criar modelo"}</Button>{!pending && <Link href={detailHref} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4">{editing ? "Voltar ao modelo" : "Voltar aos modelos"}</Link>}</div>
+    <div className="flex flex-wrap justify-end items-center gap-4 border-t border-border pt-5">{!pending && <Link href={detailHref} className="inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary  ">{editing ? "Voltar ao modelo" : "Voltar aos modelos"}</Link>}<Button type="submit" loading={pending} loadingLabel={editing ? "Salvando…" : "Criando…"}>{editing ? "Salvar alterações" : "Criar modelo"}</Button></div>
     <p className="text-sm text-text-secondary">{editing ? "As alterações valem para futuras aplicações do modelo. Semanas já preenchidas não são atualizadas ao salvar ou reaplicar o modelo." : "Criar o modelo não adiciona atividades ao calendário."}</p>
-  </form>;
+  </FormSurface>;
 }

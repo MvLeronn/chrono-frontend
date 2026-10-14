@@ -9,6 +9,7 @@
   --color-text-primary: #172b3a;
   --color-text-secondary: #526575;
   --color-border: #dce5ec;
+  --color-field: #8295a4;
   --color-text-on-primary: #ffffff;
   --color-focus-ring: #155e75;
   --color-status-pending: #854d0e;
@@ -23,8 +24,8 @@
   --color-error-soft: #fef2f2;
   --color-danger: #b91c1c;
   --color-danger-soft: #fef2f2;
-  --radius-control: 0.5rem;
-  --radius-surface: 0.75rem;
+  --radius-control: 0.75rem;
+  --radius-surface: 1.5rem;
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
@@ -43,7 +44,8 @@
   }
 }
 
-/* Keep the calendar behind an open recurrence dialog stationary. */
-body:has(.recurring-modal[open]) {
+/* Keep the calendar stationary behind an open dialog. */
+body:has(.recurring-modal[open], .activity-modal[open], .route-modal[open]) {
   overflow: hidden;
 }
+

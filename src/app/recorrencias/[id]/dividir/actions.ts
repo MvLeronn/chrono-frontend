@@ -48,7 +48,6 @@ export async function splitRecurringAction(id: string, fromDate: string, initial
   if (!result.ok) return failure(result, true);
   revalidatePath("/");
   revalidatePath("/recorrencias", "layout");
-  revalidatePath("/ocorrencias", "layout");
   if (returnToList) redirect("/recorrencias?updated=1");
-  redirect(`/recorrencias/${result.data.id}?split=1`);
+  redirect(`/recorrencias?modal=RecurringDetails&id=${result.data.id}&split=1`);
 }
